@@ -1,0 +1,170 @@
+import { useState } from 'react';
+import { verifySignature } from '../../utils/crypto';
+
+interface SignatureVerifierProps {
+  publicKeys: { id: string; key: string; compressed: boolean }[];
+}
+
+export default function SignatureVerifier({ publicKeys }: SignatureVerifierProps) {
+  const [message, setMessage] = useState('');
+  const [signature, setSignature] = useState('');
+  const [verificationResult, setVerificationResult] = useState<boolean | null>(null);
+  const [isVerifying, setIsVerifying] = useState(false);
+
+  const handleVerify = async () => {
+    const publicKey = publicKeys[0]?.key;
+    if (!message || !signature || !publicKey) return;
+    
+    setIsVerifying(true);
+    try {
+      const result = verifySignature(message, signature, publicKey);
+      setVerificationResult(result);
+    } catch (error) {
+      console.error('Verification failed:', error);
+      setVerificationResult(false);
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  const resetVerification = () => {
+    setMessage('');
+    setSignature('');
+    setVerificationResult(null);
+  };
+
+
+  return (
+    <div className="bg-white rounded-lg shadow-lg p-8 border border-gray-200">
+      <div className="flex items-center gap-4 mb-8">
+        <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0">
+          <span className="text-white font-bold text-lg">5</span>
+        </div>
+        <h2 className="text-2xl font-bold text-gray-800">Verify Signature</h2>
+      </div>
+
+      {publicKeys.length === 0 ? (
+        <div className="text-center py-8 text-gray-600">
+          <p>Generate a public key first to verify signatures</p>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          <div className="text-sm text-gray-600 mb-4">
+            <p>Verify signatures using the original message and public key:</p>
+            <ul className="list-disc list-inside mt-2 space-y-1">
+              <li>Enter the exact message that was signed</li>
+              <li>Provide the signature to verify</li>
+              <li>Select the corresponding public key</li>
+            </ul>
+          </div>
+
+          <div className="space-y-4">
+          <label className="block text-sm font-medium text-blue-600">
+            Original Message:
+          </label>
+          <textarea
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            className="w-full p-4 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700 placeholder-gray-500"
+            rows={4}
+            placeholder="Enter the original message that was signed..."
+          />
+        </div>
+
+        <div className="space-y-4">
+          <label className="block text-sm font-medium text-blue-600">
+            Signature:
+          </label>
+          <input
+            type="text"
+            value={signature}
+            onChange={(e) => setSignature(e.target.value)}
+            className="w-full p-4 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm text-gray-700 placeholder-gray-500"
+            placeholder="Enter the signature to verify..."
+          />
+        </div>
+
+        <div className="space-y-4">
+          <label className="block text-sm font-medium text-blue-600">
+            Public Key for Verification:
+          </label>
+          {publicKeys.length > 0 ? (
+            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+              <div className="font-mono text-sm break-all text-gray-700">
+                {publicKeys[0].key}
+              </div>
+            </div>
+          ) : (
+            <div className="text-gray-600 text-sm bg-gray-50 p-4 rounded-lg">
+              No public key available. Generate a public key first.
+            </div>
+          )}
+        </div>
+
+        <div className="flex gap-2">
+          <button
+            onClick={handleVerify}
+            disabled={!message || !signature || publicKeys.length === 0 || isVerifying}
+            className="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-6 rounded-md transition-colors duration-200 border border-blue-500 hover:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-500 disabled:hover:border-blue-500"
+          >
+            {isVerifying ? 'Verifying...' : 'Verify Signature'}
+          </button>
+          <button
+            onClick={resetVerification}
+            className="bg-gray-500 hover:bg-gray-600 text-white font-medium py-3 px-6 rounded-md transition-colors duration-200 border border-gray-500 hover:border-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+          >
+            Reset
+          </button>
+        </div>
+
+        {verificationResult !== null && (
+          <div className={`p-4 rounded-lg border-2 ${
+            verificationResult 
+              ? 'bg-green-50 border-green-200 text-green-700' 
+              : 'bg-red-50 border-red-200 text-red-700'
+          }`}>
+            <div className="flex items-center gap-3">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                verificationResult ? 'bg-green-500' : 'bg-red-500'
+              }`}>
+                <span className="text-white font-bold">
+                  {verificationResult ? '✓' : '✗'}
+                </span>
+              </div>
+              <div>
+                <p className={`font-bold text-lg ${
+                  verificationResult ? 'text-green-600' : 'text-red-600'
+                }`}>
+                  {verificationResult ? 'Signature Valid!' : 'Signature Invalid!'}
+                </p>
+                <p className="text-sm">
+                  {verificationResult 
+                    ? 'The signature was created by the holder of the corresponding private key.' 
+                    : 'The signature does not match the message and public key combination.'}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+          <div className="flex items-start gap-3">
+            <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+              <span className="text-white text-sm font-bold">i</span>
+            </div>
+            <div className="text-sm text-gray-600">
+              <p className="font-medium mb-1 text-blue-600">How signature verification works:</p>
+              <ul className="list-disc list-inside space-y-1 text-xs">
+                <li>The message is hashed using keccak256</li>
+                <li>The signature is verified against the hash and public key</li>
+                <li>Only the holder of the corresponding private key could have created a valid signature</li>
+                <li>This proves authenticity and non-repudiation</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
+    </div>
+  );
+}
