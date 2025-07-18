@@ -1,10 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useToast } from './Toast.jsx';
 
+interface BlockSigningTabProps {
+  currentTab: string;
+  calculateHash: (input: string) => Promise<string>;
+}
+
 function BlockSigningTab({ 
   currentTab, 
   calculateHash
-}) {
+}: BlockSigningTabProps) {
   const { showSuccess, showWarning } = useToast();
   
   // Block state
@@ -15,9 +20,9 @@ function BlockSigningTab({
     timestamp: Date.now()
   });
   
-  const [currentHash, setCurrentHash] = useState('');
-  const [signature, setSignature] = useState(null);
-  const [isValid, setIsValid] = useState(true);
+  const [currentHash, setCurrentHash] = useState<string>('');
+  const [signature, setSignature] = useState<any>(null);
+  const [isValid, setIsValid] = useState<boolean>(true);
 
   // Calculate hash whenever block data changes
   useEffect(() => {
@@ -61,7 +66,7 @@ function BlockSigningTab({
     );
   };
 
-  const handleDataChange = (newData) => {
+  const handleDataChange = (newData: string) => {
     setBlockData(prev => ({ ...prev, data: newData }));
     
     if (signature) {

@@ -1,4 +1,13 @@
 // src/components/TransactionModal.jsx
+interface TransactionModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  title: string;
+  transactionData: any;
+  isProcessing?: boolean;
+}
+
 const TransactionModal = ({ 
   isOpen, 
   onClose, 
@@ -6,7 +15,7 @@ const TransactionModal = ({
   title, 
   transactionData,
   isProcessing = false 
-}) => {
+}: TransactionModalProps) => {
   if (!isOpen) return null;
 
   const handleConfirm = () => {
@@ -85,7 +94,7 @@ const TransactionModal = ({
               <div className="bg-gray-50 rounded-lg p-4">
                 <h4 className="font-medium mb-2">Transaction Details:</h4>
                 <div className="text-xs font-mono bg-white p-2 rounded border space-y-1">
-                  {transactionData.details.map((detail, index) => (
+                  {transactionData.details.map((detail: string, index: number) => (
                     <div key={index}>{detail}</div>
                   ))}
                 </div>

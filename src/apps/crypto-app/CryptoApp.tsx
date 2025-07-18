@@ -3,17 +3,27 @@ import ProgressIndicator from './ProgressIndicator';
 import CompletionModal from './CompletionModal';
 import WalletDemo from './WalletDemo';
 import DexDemo from './DexDemo';
-import NFTDemo from './NFTDemo';
 import StakingDemo from './StakingDemo';
 
+interface StakingCompletion {
+  staked: boolean;
+  claimed: boolean;
+}
+
+interface CompletedActions {
+  wallet: boolean;
+  dex: boolean;
+  staking: StakingCompletion;
+}
+
 const CryptoDemoApp = () => {
-  const [currentDemo, setCurrentDemo] = useState(0);
-  const [completedActions, setCompletedActions] = useState({
+  const [currentDemo, setCurrentDemo] = useState<number>(0);
+  const [completedActions, setCompletedActions] = useState<CompletedActions>({
     wallet: false,
     dex: false,
     staking: { staked: false, claimed: false }
   });
-  const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [showCompletionModal, setShowCompletionModal] = useState<boolean>(false);
 
   const demos = [
     {
@@ -43,7 +53,7 @@ const CryptoDemoApp = () => {
   ];
 
   // Check if all required actions are completed
-  const isFullyCompleted = () => {
+  const isFullyCompleted = (): boolean => {
     return completedActions.wallet && 
            completedActions.dex && 
            completedActions.staking.staked && 
@@ -51,7 +61,7 @@ const CryptoDemoApp = () => {
   };
 
   // Check completion status for each demo
-  const getDemoCompletionStatus = (demoId) => {
+  const getDemoCompletionStatus = (demoId: string): boolean => {
     switch (demoId) {
       case 'wallet':
         return completedActions.wallet;
@@ -67,14 +77,16 @@ const CryptoDemoApp = () => {
   };
 
   // Mark action as completed
-  const markCompleted = (action, subAction = null) => {
+  const markCompleted = (action: string, subAction?: string): void => {
     setCompletedActions(prev => {
       const newState = { ...prev };
       
-      if (subAction) {
-        newState[action] = { ...prev[action], [subAction]: true };
-      } else {
-        newState[action] = true;
+      if (subAction && action === 'staking') {
+        newState.staking = { ...prev.staking, [subAction]: true };
+      } else if (action === 'wallet') {
+        newState.wallet = true;
+      } else if (action === 'dex') {
+        newState.dex = true;
       }
       
       return newState;
@@ -91,19 +103,19 @@ const CryptoDemoApp = () => {
     }
   }, [completedActions, showCompletionModal]);
 
-  const nextDemo = () => {
+  const nextDemo = (): void => {
     if (currentDemo < demos.length - 1) {
       setCurrentDemo(currentDemo + 1);
     }
   };
 
-  const prevDemo = () => {
+  const prevDemo = (): void => {
     if (currentDemo > 0) {
       setCurrentDemo(currentDemo - 1);
     }
   };
 
-  const goToDemo = (index) => {
+  const goToDemo = (index: number): void => {
     setCurrentDemo(index);
   };
 

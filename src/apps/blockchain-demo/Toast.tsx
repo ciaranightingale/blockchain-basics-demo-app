@@ -1,10 +1,40 @@
 import { useState, useEffect, createContext, useContext } from 'react';
+import type { ReactNode } from 'react';
+
+// Type definitions
+interface ToastType {
+  id: number;
+  message: string;
+  type: 'success' | 'error' | 'warning' | 'info';
+  title?: string | null;
+}
+
+interface ToastContextType {
+  showSuccess: (message: string, title?: string | null) => void;
+  showError: (message: string, title?: string | null) => void;
+  showWarning: (message: string, title?: string | null) => void;
+  showInfo: (message: string, title?: string | null) => void;
+}
+
+interface ToastProps {
+  toast: ToastType;
+  onClose: (id: number) => void;
+}
+
+interface ToastContainerProps {
+  toasts: ToastType[];
+  onClose: (id: number) => void;
+}
+
+interface ToastProviderProps {
+  children: ReactNode;
+}
 
 // Toast Context
-const ToastContext = createContext();
+const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
 // Individual Toast Component
-const Toast = ({ toast, onClose }) => {
+const Toast = ({ toast, onClose }: ToastProps) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       onClose(toast.id);
@@ -46,7 +76,7 @@ const Toast = ({ toast, onClose }) => {
 };
 
 // Toast Container Component
-const ToastContainer = ({ toasts, onClose }) => {
+const ToastContainer = ({ toasts, onClose }: ToastContainerProps) => {
   if (toasts.length === 0) return null;
 
   return (
@@ -59,10 +89,10 @@ const ToastContainer = ({ toasts, onClose }) => {
 };
 
 // Toast Provider Component
-const ToastProvider = ({ children }) => {
-  const [toasts, setToasts] = useState([]);
+const ToastProvider = ({ children }: ToastProviderProps) => {
+  const [toasts, setToasts] = useState<ToastType[]>([]);
   
-  const addToast = (message, type = 'info', title = null) => {
+  const addToast = (message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info', title: string | null = null) => {
     const id = Date.now() + Math.random();
     const toast = { id, message, type, title };
     setToasts(prev => {
@@ -72,16 +102,16 @@ const ToastProvider = ({ children }) => {
     });
   };
   
-  const removeToast = (id) => {
+  const removeToast = (id: number) => {
     setToasts(prev => prev.filter(toast => toast.id !== id));
   };
   
-  const showSuccess = (message, title = null) => addToast(message, 'success', title);
-  const showError = (message, title = null) => addToast(message, 'error', title);
-  const showWarning = (message, title = null) => addToast(message, 'warning', title);
-  const showInfo = (message, title = null) => addToast(message, 'info', title);
+  const showSuccess = (message: string, title: string | null = null) => addToast(message, 'success', title);
+  const showError = (message: string, title: string | null = null) => addToast(message, 'error', title);
+  const showWarning = (message: string, title: string | null = null) => addToast(message, 'warning', title);
+  const showInfo = (message: string, title: string | null = null) => addToast(message, 'info', title);
 
-  const contextValue = {
+  const contextValue: ToastContextType = {
     showSuccess,
     showError,
     showWarning,
@@ -97,7 +127,7 @@ const ToastProvider = ({ children }) => {
 };
 
 // Custom hook for using toasts
-const useToast = () => {
+const useToast = (): ToastContextType => {
   const context = useContext(ToastContext);
   if (!context) {
     throw new Error('useToast must be used within ToastProvider');

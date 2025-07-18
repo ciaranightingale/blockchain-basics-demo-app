@@ -1,24 +1,53 @@
-import { useToast } from './Toast.jsx';
+import React from 'react';
+import { useToast } from './Toast';
 
-function BlockchainTab({ 
+// Type definitions
+interface Validator {
+  id: string;
+  name: string;
+  isActive: boolean;
+  stake?: number;
+}
+
+interface Block {
+  block: number;
+  data: string;
+  hash: string;
+  prevHash: string;
+  validator: string;
+  isValid: boolean | 'unsigned';
+  isMalicious?: boolean;
+  finalized?: boolean;
+  attestations?: number;
+}
+
+interface BlockchainTabProps {
+  validators: Validator[];
+  currentTab: string;
+  blockchain: Block[];
+  handleBlockchainDataChange?: (blockIndex: number, newData: string) => void;
+  handleValidateBlock?: (blockIndex: number) => void;
+}
+
+const BlockchainTab: React.FC<BlockchainTabProps> = ({ 
   validators, 
   currentTab, 
   blockchain,
   handleBlockchainDataChange,
   handleValidateBlock
-}) {
+}) => {
   // Get toast functions from context
-  const { showSuccess, showWarning, showError, showInfo } = useToast();
+  const { showError } = useToast();
 
   // Enhanced handler with toast notifications for blockchain changes
-  const handleDataChange = (blockIndex, newData) => {
+  const handleDataChange = (blockIndex: number, newData: string): void => {
     if (!handleBlockchainDataChange) {
       showError('Blockchain data change handler not available', '❌ Error');
       return;
     }
 
     // Store original data to compare
-    const originalData = blockchain[blockIndex]?.data;
+    // const originalData = blockchain[blockIndex]?.data;
     
     // Call the parent handler
     handleBlockchainDataChange(blockIndex, newData);
@@ -32,7 +61,6 @@ function BlockchainTab({
             <h2 className="text-3xl font-bold text-gray-800 mb-2">Ethereum PoS Blockchain</h2>
             <p className="text-gray-600">View the blockchain and experiment with hash validation and signing</p>
           </div>
-
 
           {/* Hash Validation Explainer */}
           <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
@@ -239,6 +267,6 @@ function BlockchainTab({
       )}
     </>
   );
-}
+};
 
 export default BlockchainTab;

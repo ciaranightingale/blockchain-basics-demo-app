@@ -1,17 +1,40 @@
-// src/demos/WalletDemo.jsx
-import React, { useState } from 'react';
+// src/demos/WalletDemo.tsx
+import { useState } from 'react';
 import { Wallet, Send, Eye, EyeOff, Copy, Check } from 'lucide-react';
 
-const WalletDemo = ({ onActionCompleted }) => {
+interface WalletState {
+  address: string;
+  balance: number;
+  privateKey: string;
+  showPrivateKey: boolean;
+}
+
+interface TransactionData {
+  from: string;
+  to: string;
+  value: string;
+  gasPrice: string;
+  gasLimit: string;
+  fee: string;
+  total: string;
+  nonce: number;
+  data: string;
+}
+
+interface WalletDemoProps {
+  onActionCompleted: (action: string) => void;
+}
+
+const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
   // Wallet states
-  const [walletA, setWalletA] = useState({
+  const [walletA, setWalletA] = useState<WalletState>({
     address: '0x742d35Cc7B4C4532C...a3eC73ac',
     balance: 2.5,
     privateKey: '0x8da4ef21b864d2cc526dbdb2a120bd2874c36c9d0a1fb7f8c63d7f7a8b41de8f',
     showPrivateKey: false
   });
 
-  const [walletB, setWalletB] = useState({
+  const [walletB, setWalletB] = useState<WalletState>({
     address: '0x8ba1f109551bD432E...c6BcF04b',
     balance: 1.8,
     privateKey: '0x4c0883a69102937d6231471b5dbb6204fe5129617082792ae468d01a3f362318',
@@ -19,19 +42,19 @@ const WalletDemo = ({ onActionCompleted }) => {
   });
 
   // Transaction states
-  const [sendAmount, setSendAmount] = useState('');
-  const [recipient, setRecipient] = useState('');
-  const [gasPrice, setGasPrice] = useState('20');
-  const [gasLimit, setGasLimit] = useState('21000');
-  const [activeWallet, setActiveWallet] = useState('A');
-  const [showTransactionModal, setShowTransactionModal] = useState(false);
-  const [transactionData, setTransactionData] = useState(null);
-  const [copied, setCopied] = useState('');
+  const [sendAmount, setSendAmount] = useState<string>('');
+  const [recipient, setRecipient] = useState<string>('');
+  const [gasPrice, setGasPrice] = useState<string>('20');
+  const [gasLimit, setGasLimit] = useState<string>('21000');
+  const [activeWallet, setActiveWallet] = useState<string>('A');
+  const [showTransactionModal, setShowTransactionModal] = useState<boolean>(false);
+  const [transactionData, setTransactionData] = useState<TransactionData | null>(null);
+  const [copied, setCopied] = useState<string>('');
 
   const currentWallet = activeWallet === 'A' ? walletA : walletB;
   const targetWallet = activeWallet === 'A' ? walletB : walletA;
 
-  const togglePrivateKey = (wallet) => {
+  const togglePrivateKey = (wallet: string): void => {
     if (wallet === 'A') {
       setWalletA(prev => ({ ...prev, showPrivateKey: !prev.showPrivateKey }));
     } else {
@@ -39,17 +62,17 @@ const WalletDemo = ({ onActionCompleted }) => {
     }
   };
 
-  const copyToClipboard = async (text, type) => {
+  const copyToClipboard = async (text: string, type: string): Promise<void> => {
     await navigator.clipboard.writeText(text);
     setCopied(type);
     setTimeout(() => setCopied(''), 2000);
   };
 
-  const calculateTransactionFee = () => {
+  const calculateTransactionFee = (): number => {
     return (parseFloat(gasPrice) * parseFloat(gasLimit)) / 1000000000; // Convert to ETH
   };
 
-  const prepareTransaction = () => {
+  const prepareTransaction = (): void => {
     if (!sendAmount || parseFloat(sendAmount) <= 0) {
       alert('Please enter a valid amount');
       return;
@@ -85,7 +108,7 @@ const WalletDemo = ({ onActionCompleted }) => {
     setTransactionData(txData);
   };
 
-  const signAndSendTransaction = () => {
+  const signAndSendTransaction = (): void => {
     const amount = parseFloat(sendAmount);
     const fee = calculateTransactionFee();
     
@@ -110,7 +133,7 @@ const WalletDemo = ({ onActionCompleted }) => {
     alert('Transaction signed and sent successfully!');
   };
 
-  const WalletCard = ({ wallet, walletName, isActive }) => (
+  const WalletCard = ({ wallet, walletName, isActive }: { wallet: WalletState; walletName: string; isActive: boolean }) => (
     <div className={`bg-white rounded-xl shadow-lg p-6 border-2 transition-all ${
       isActive ? 'border-blue-500 shadow-xl' : 'border-gray-200'
     }`}>
@@ -289,7 +312,7 @@ const WalletDemo = ({ onActionCompleted }) => {
                     <div className="flex justify-between items-center text-sm mt-1">
                       <span className="text-gray-600">Total (Amount + Fee):</span>
                       <span className="font-bold text-lg">
-                        {sendAmount ? (parseFloat(sendAmount || 0) + calculateTransactionFee()).toFixed(6) : calculateTransactionFee().toFixed(6)} ETH
+                        {sendAmount ? (parseFloat(sendAmount || '0') + calculateTransactionFee()).toFixed(6) : calculateTransactionFee().toFixed(6)} ETH
                       </span>
                     </div>
                   </div>

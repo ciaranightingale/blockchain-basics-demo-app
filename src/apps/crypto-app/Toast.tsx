@@ -1,6 +1,15 @@
 // src/components/Toast.jsx
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { CheckCircle, XCircle, AlertCircle, Info, X } from 'lucide-react';
+
+interface ToastProps {
+  message: string;
+  type?: 'success' | 'error' | 'warning' | 'info';
+  isVisible: boolean;
+  onClose: () => void;
+  duration?: number;
+  title?: string;
+}
 
 const Toast = ({ 
   message, 
@@ -9,7 +18,7 @@ const Toast = ({
   onClose, 
   duration = 4000,
   title 
-}) => {
+}: ToastProps) => {
   useEffect(() => {
     if (isVisible && duration > 0) {
       const timer = setTimeout(() => {
@@ -79,11 +88,11 @@ export const useToast = () => {
   const [toast, setToast] = useState({
     isVisible: false,
     message: '',
-    type: 'success',
+    type: 'success' as 'success' | 'error' | 'warning' | 'info',
     title: ''
   });
 
-  const showToast = (message, type = 'success', title = '') => {
+  const showToast = (message: string, type: 'success' | 'error' | 'warning' | 'info' = 'success', title: string = '') => {
     setToast({
       isVisible: true,
       message,

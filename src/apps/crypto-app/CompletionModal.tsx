@@ -1,7 +1,12 @@
-// src/components/CompletionModal.jsx
+// src/components/CompletionModal.tsx
 import { Trophy, CheckCircle, Sparkles, Star } from 'lucide-react';
 
-const CompletionModal = ({ isOpen, onClose }) => {
+interface CompletionModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const CompletionModal = ({ isOpen, onClose }: CompletionModalProps) => {
   if (!isOpen) return null;
 
   return (

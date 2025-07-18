@@ -1,4 +1,11 @@
-const Hash = ({ currentTab, hashData, computedHash, setHashData }) => {
+interface HashProps {
+  currentTab: string;
+  hashData: string;
+  computedHash: string;
+  setHashData: (data: string) => void;
+}
+
+const Hash = ({ currentTab, hashData, computedHash, setHashData }: HashProps) => {
   return (
     <>
         {currentTab === 'hash' && (
@@ -14,7 +21,7 @@ const Hash = ({ currentTab, hashData, computedHash, setHashData }) => {
                     value={hashData}
                     onChange={(e) => setHashData(e.target.value)}
                     className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    rows="4"
+                    rows={4}
                     placeholder="Enter data to hash..."
                     />
                 </div>

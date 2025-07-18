@@ -1,3 +1,19 @@
+interface DecentralizedTabProps {
+  currentTab: string;
+  validators: any[];
+  pendingProposal: any;
+  handleProposeBlockDecentralized: () => void;
+  handleVoteBlock: (validatorName: string, voteType: 'approve' | 'reject') => void;
+  validatorVotes: Record<string, any>;
+  selectedProposer: string;
+  setSelectedProposer: (proposer: string) => void;
+  autoSelectedValidator: string;
+  pendingTransactions: any[];
+  selectedTransactions: number[];
+  handleTxSelection: (txId: number, isSelected: boolean) => void;
+  blockchain: any[];
+}
+
 function DecentralizedTab({ 
   currentTab, 
   validators, 
@@ -12,7 +28,7 @@ function DecentralizedTab({
   selectedTransactions,
   handleTxSelection,
   blockchain
-}) {
+}: DecentralizedTabProps) {
 
   return (
     <>
@@ -251,13 +267,13 @@ function DecentralizedTab({
                     {!validatorVotes[validator.name] ? (
                       <div className="grid grid-cols-2 gap-2">
                         <button
-                          onClick={() => handleVoteBlock(validator.name, 'yes')}
+                          onClick={() => handleVoteBlock(validator.name, 'approve')}
                           className="py-2 px-3 text-xs font-medium rounded transition-colors bg-green-500 hover:bg-green-600 text-white"
                         >
                           YES ({validator.stake} ETH)
                         </button>
                         <button
-                          onClick={() => handleVoteBlock(validator.name, 'no')}
+                          onClick={() => handleVoteBlock(validator.name, 'reject')}
                           className="py-2 px-3 text-xs font-medium rounded transition-colors bg-red-500 hover:bg-red-600 text-white"
                         >
                           NO ({validator.stake} ETH)

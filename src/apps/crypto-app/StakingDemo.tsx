@@ -1,30 +1,79 @@
 // src/demos/StakingDemo.jsx
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Coins, PiggyBank, TrendingUp, Clock, Award, Plus, Minus } from 'lucide-react';
 import TransactionModal from './TransactionModal';
 import { useToast } from './Toast';
 
-const StakingDemo = ({ onActionCompleted }) => {
-  const [selectedPool, setSelectedPool] = useState(null);
-  const [stakeAmount, setStakeAmount] = useState('');
-  const [unstakeAmount, setUnstakeAmount] = useState('');
-  const [showStakeModal, setShowStakeModal] = useState(false);
-  const [showUnstakeModal, setShowUnstakeModal] = useState(false);
-  const [showTransactionModal, setShowTransactionModal] = useState(false);
-  const [transactionData, setTransactionData] = useState(null);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [currentAction, setCurrentAction] = useState(''); // 'stake', 'unstake', 'claim'
+interface StakingPool {
+  id: string;
+  token: string;
+  name: string;
+  apy: number;
+  tvl: string;
+  minStake: number;
+  lockPeriod: string;
+  color: string;
+  description: string;
+  riskLevel: string;
+}
+
+interface UserStake {
+  amount: number;
+  rewards: number;
+  timeStaked: number;
+}
+
+interface UserBalances {
+  ETH: number;
+  USDC: number;
+  UNI: number;
+  LINK: number;
+  [key: string]: number;
+}
+
+interface UserStakes {
+  'ETH-STAKE': UserStake;
+  'USDC-STAKE': UserStake;
+  'UNI-STAKE': UserStake;
+  'LINK-STAKE': UserStake;
+  [key: string]: UserStake;
+}
+
+interface TransactionData {
+  from: string;
+  to: string;
+  action: string;
+  amount: string;
+  fee: string;
+  total: string;
+  details: string[];
+}
+
+interface StakingDemoProps {
+  onActionCompleted: (action: string, type?: string) => void;
+}
+
+const StakingDemo = ({ onActionCompleted }: StakingDemoProps) => {
+  const [selectedPool, setSelectedPool] = useState<StakingPool | null>(null);
+  const [stakeAmount, setStakeAmount] = useState<string>('');
+  const [unstakeAmount, setUnstakeAmount] = useState<string>('');
+  const [showStakeModal, setShowStakeModal] = useState<boolean>(false);
+  const [showUnstakeModal, setShowUnstakeModal] = useState<boolean>(false);
+  const [showTransactionModal, setShowTransactionModal] = useState<boolean>(false);
+  const [transactionData, setTransactionData] = useState<TransactionData | null>(null);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [currentAction, setCurrentAction] = useState<string>(''); // 'stake', 'unstake', 'claim'
 
   const { showToast, ToastComponent } = useToast();
 
-  const [userBalances, setUserBalances] = useState({
+  const [userBalances, setUserBalances] = useState<UserBalances>({
     ETH: 5.25,
     USDC: 12500,
     UNI: 450,
     LINK: 230
   });
 
-  const [userStakes, setUserStakes] = useState({
+  const [userStakes, setUserStakes] = useState<UserStakes>({
     'ETH-STAKE': { amount: 2.5, rewards: 0.125, timeStaked: Date.now() - 86400000 * 30 },
     'USDC-STAKE': { amount: 5000, rewards: 125.5, timeStaked: Date.now() - 86400000 * 15 },
     'UNI-STAKE': { amount: 0, rewards: 0, timeStaked: 0 },
@@ -32,7 +81,7 @@ const StakingDemo = ({ onActionCompleted }) => {
   });
 
   // Mock staking pools
-  const stakingPools = [
+  const stakingPools: StakingPool[] = [
     {
       id: 'ETH-STAKE',
       token: 'ETH',
@@ -83,16 +132,18 @@ const StakingDemo = ({ onActionCompleted }) => {
     }
   ];
 
-  const formatTime = (timestamp) => {
+  const formatTime = (timestamp: number): string => {
     const days = Math.floor((Date.now() - timestamp) / (1000 * 60 * 60 * 24));
     return `${days} day${days !== 1 ? 's' : ''}`;
   };
 
-  const calculateProjectedRewards = (amount, apy, days = 365) => {
+  const calculateProjectedRewards = (amount: string, apy: number, days: number = 365): string => {
     return (parseFloat(amount) * (apy / 100) * (days / 365)).toFixed(6);
   };
 
-  const handleStake = () => {
+  const handleStake = (): void => {
+    if (!selectedPool) return;
+    
     const amount = parseFloat(stakeAmount);
     
     if (!stakeAmount || amount <= 0) {
@@ -133,7 +184,9 @@ const StakingDemo = ({ onActionCompleted }) => {
     setShowTransactionModal(true);
   };
 
-  const handleUnstake = () => {
+  const handleUnstake = (): void => {
+    if (!selectedPool) return;
+    
     const amount = parseFloat(unstakeAmount);
     
     if (!unstakeAmount || amount <= 0 || amount > userStakes[selectedPool.id].amount) {
@@ -164,9 +217,10 @@ const StakingDemo = ({ onActionCompleted }) => {
     setShowTransactionModal(true);
   };
 
-  const claimRewards = (poolId) => {
+  const claimRewards = (poolId: string): void => {
     const rewards = userStakes[poolId].rewards;
     const pool = stakingPools.find(p => p.id === poolId);
+    if (!pool) return;
     
     // Prepare transaction data
     const txData = {
@@ -191,11 +245,11 @@ const StakingDemo = ({ onActionCompleted }) => {
     setShowTransactionModal(true);
   };
 
-  const executeTransaction = () => {
+  const executeTransaction = (): void => {
     setIsProcessing(true);
     
     setTimeout(() => {
-      if (currentAction === 'stake') {
+      if (currentAction === 'stake' && selectedPool) {
         const amount = parseFloat(stakeAmount);
         setUserBalances(prev => ({
           ...prev,
@@ -221,7 +275,7 @@ const StakingDemo = ({ onActionCompleted }) => {
           'success',
           'Staking Successful! 🏦'
         );
-      } else if (currentAction === 'unstake') {
+      } else if (currentAction === 'unstake' && selectedPool) {
         const amount = parseFloat(unstakeAmount);
         setUserBalances(prev => ({
           ...prev,
@@ -240,7 +294,7 @@ const StakingDemo = ({ onActionCompleted }) => {
           'success',
           'Unstaking Successful! 💰'
         );
-      } else if (currentAction === 'claim') {
+      } else if (currentAction === 'claim' && selectedPool) {
         const rewards = userStakes[selectedPool.id].rewards;
         setUserBalances(prev => ({
           ...prev,
@@ -273,7 +327,7 @@ const StakingDemo = ({ onActionCompleted }) => {
     }, 2000);
   };
 
-  const StakingPoolCard = ({ pool }) => {
+  const StakingPoolCard = ({ pool }: { pool: StakingPool }) => {
     const userStake = userStakes[pool.id];
     const isStaked = userStake.amount > 0;
 
@@ -377,7 +431,7 @@ const StakingDemo = ({ onActionCompleted }) => {
     const pool = stakingPools.find(p => p.id === poolId);
     if (pool && stake.amount > 0) {
       // Mock prices for calculation
-      const prices = { ETH: 2500, USDC: 1, UNI: 8.5, LINK: 15.2 };
+      const prices: { [key: string]: number } = { ETH: 2500, USDC: 1, UNI: 8.5, LINK: 15.2 };
       return total + (stake.amount * prices[pool.token]);
     }
     return total;

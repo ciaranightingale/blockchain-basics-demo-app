@@ -7,24 +7,87 @@ import DecentralizedTab from './DecentralizedTab';
 import BlockSigningTab from './BlockSigningTab';
 import { ToastProvider, useToast } from './Toast';
 
+// Type definitions
+interface Transaction {
+  id: number;
+  from: string;
+  to: string;
+  amount: string;
+  fee: string;
+}
+
+export interface Validator {
+  id: string;
+  address: string;
+  name: string;
+  stake: number;
+  isActive: boolean;
+  isMalicious: boolean;
+  slashingRisk: number;
+  rewards: number;
+  uptime: number;
+}
+
+interface Block {
+  block: number;
+  data: string;
+  prevHash: string;
+  hash: string;
+  signedHash: string;
+  validator: string;
+  attestations: number;
+  finalized: boolean;
+  isValid: boolean | 'unsigned';
+  attested?: boolean;
+  isMalicious?: boolean;
+  transactions?: Transaction[];
+  consensusPercentage?: number;
+}
+
+interface Proposal {
+  blockNumber: number;
+  proposer: string;
+  transactions: Transaction[];
+  data: string;
+  prevHash: string;
+  hash: string;
+  attestations: Vote[];
+  timestamp: number;
+  block?: number;
+  validator?: string;
+  votes?: Record<string, 'approve' | 'reject' | null>;
+  status?: 'pending' | 'approved' | 'rejected';
+}
+
+interface Vote {
+  validatorName: string;
+  stake: number;
+  isMalicious: boolean;
+  voteType: 'approve' | 'reject';
+}
+
+interface DecentralizedBlockchain {
+  [key: string]: Block[];
+}
+
 const EthereumPoSDemo = () => {
-  const [currentTab, setCurrentTab] = useState('hash');
+  const [currentTab, setCurrentTab] = useState<string>('hash');
   
   // Get toast functions from context
   const { showSuccess, showError, showWarning } = useToast();
   
   // Hash Tab State
-  const [hashData, setHashData] = useState('');
-  const [computedHash, setComputedHash] = useState('');
+  const [hashData, setHashData] = useState<string>('');
+  const [computedHash, setComputedHash] = useState<string>('');
   
   // Block Tab State - removed blockNumber and prevHash states
-  const [blockData, setBlockData] = useState('');
+  // const [blockData, setBlockData] = useState<string>(''); // Unused
   
   // Transaction selection state
-  const [selectedTransactions, setSelectedTransactions] = useState([]);
+  const [selectedTransactions, setSelectedTransactions] = useState<number[]>([]);
   
   // Pending transactions data
-  const pendingTransactions = [
+  const pendingTransactions: Transaction[] = [
     { id: 1, from: '0xalice...', to: '0xbob...', amount: '2.5 ETH', fee: '0.001 ETH' },
     { id: 2, from: '0xcharlie...', to: '0xdiana...', amount: '100 USDC', fee: '0.002 ETH' },
     { id: 3, from: '0xeve...', to: '0xfrank...', amount: '0.8 ETH', fee: '0.0015 ETH' },
@@ -34,28 +97,28 @@ const EthereumPoSDemo = () => {
   ];
   
   // Validators State
-  const [validators, setValidators] = useState([
-    { address: '0x1a2b3c...', name: 'Alice', stake: 32.0, isActive: true, isMalicious: false, slashingRisk: 0 },
-    { address: '0x4d5e6f...', name: 'Bob', stake: 32.0, isActive: true, isMalicious: false, slashingRisk: 0 },
-    { address: '0x7g8h9i...', name: 'Charlie', stake: 32.0, isActive: true, isMalicious: false, slashingRisk: 0 },
-    { address: '0xj1k2l3...', name: 'Diana', stake: 32.0, isActive: true, isMalicious: false, slashingRisk: 0 },
-    { address: '0xm4n5o6...', name: 'Eve', stake: 32.0, isActive: true, isMalicious: false, slashingRisk: 0 },
-    { address: '0xf7g8h9...', name: 'Frank', stake: 32.0, isActive: true, isMalicious: false, slashingRisk: 0 },
-    { address: '0xi1j2k3...', name: 'Grace', stake: 32.0, isActive: true, isMalicious: false, slashingRisk: 0 },
-    { address: '0xl4m5n6...', name: 'Henry', stake: 32.0, isActive: true, isMalicious: false, slashingRisk: 0 },
-    { address: '0xo7p8q9...', name: 'Ivy', stake: 32.0, isActive: false, isMalicious: false, slashingRisk: 1.8 },
-    { address: '0xr1s2t3...', name: 'Jack', stake: 32.0, isActive: true, isMalicious: false, slashingRisk: 0 },
+  const [validators, setValidators] = useState<Validator[]>([
+    { id: 'alice', address: '0x1a2b3c...', name: 'Alice', stake: 32.0, isActive: true, isMalicious: false, slashingRisk: 0, rewards: 0, uptime: 100 },
+    { id: 'bob', address: '0x4d5e6f...', name: 'Bob', stake: 32.0, isActive: true, isMalicious: false, slashingRisk: 0, rewards: 0, uptime: 100 },
+    { id: 'charlie', address: '0x7g8h9i...', name: 'Charlie', stake: 32.0, isActive: true, isMalicious: false, slashingRisk: 0, rewards: 0, uptime: 100 },
+    { id: 'diana', address: '0xj1k2l3...', name: 'Diana', stake: 32.0, isActive: true, isMalicious: false, slashingRisk: 0, rewards: 0, uptime: 100 },
+    { id: 'eve', address: '0xm4n5o6...', name: 'Eve', stake: 32.0, isActive: true, isMalicious: false, slashingRisk: 0, rewards: 0, uptime: 100 },
+    { id: 'frank', address: '0xf7g8h9...', name: 'Frank', stake: 32.0, isActive: true, isMalicious: false, slashingRisk: 0, rewards: 0, uptime: 100 },
+    { id: 'grace', address: '0xi1j2k3...', name: 'Grace', stake: 32.0, isActive: true, isMalicious: false, slashingRisk: 0, rewards: 0, uptime: 100 },
+    { id: 'henry', address: '0xl4m5n6...', name: 'Henry', stake: 32.0, isActive: true, isMalicious: false, slashingRisk: 0, rewards: 0, uptime: 100 },
+    { id: 'ivy', address: '0xo7p8q9...', name: 'Ivy', stake: 32.0, isActive: false, isMalicious: false, slashingRisk: 1.8, rewards: 0, uptime: 95 },
+    { id: 'jack', address: '0xr1s2t3...', name: 'Jack', stake: 32.0, isActive: true, isMalicious: false, slashingRisk: 0, rewards: 0, uptime: 100 },
   ]);
 
   // Initialize blockchain state with properly calculated hashes
-  const [blockchain, setBlockchain] = useState([]);
+  const [blockchain, setBlockchain] = useState<Block[]>([]);
   
   // Decentralized consensus state
-  const [decentralizedBlockchains, setDecentralizedBlockchains] = useState({});
-  const [pendingProposal, setPendingProposal] = useState(null);
-  const [selectedProposer, setSelectedProposer] = useState('');
-  const [validatorVotes, setValidatorVotes] = useState({});
-  const [autoSelectedValidator, setAutoSelectedValidator] = useState('');
+  const [decentralizedBlockchains, setDecentralizedBlockchains] = useState<DecentralizedBlockchain>({});
+  const [pendingProposal, setPendingProposal] = useState<Proposal | null>(null);
+  const [selectedProposer, setSelectedProposer] = useState<string>('');
+  const [validatorVotes, setValidatorVotes] = useState<Record<string, Vote | null>>({});
+  const [autoSelectedValidator, setAutoSelectedValidator] = useState<string>('');
   
   // Initialize blockchain with correct hashes on component mount
   useEffect(() => {
@@ -124,7 +187,7 @@ const EthereumPoSDemo = () => {
       setBlockchain(initialBlockchain);
       
       // Initialize empty blockchains for each validator
-      const initialDecentralizedBlockchains = {};
+      const initialDecentralizedBlockchains: DecentralizedBlockchain = {};
       validators.filter(v => v.isActive).forEach(validator => {
         initialDecentralizedBlockchains[validator.name] = [];
       });
@@ -139,7 +202,7 @@ const EthereumPoSDemo = () => {
   
   
   // Transaction selection handler
-  const handleTxSelection = (txId, isSelected) => {
+  const handleTxSelection = (txId: number, isSelected: boolean) => {
     if (isSelected) {
       setSelectedTransactions(prev => [...prev, txId]);
     } else {
@@ -148,19 +211,19 @@ const EthereumPoSDemo = () => {
   };
   
   // Utility function to calculate Keccak-256 hash (Ethereum standard)
-  const calculateHash = async (input) => {
+  const calculateHash = async (input: string) => {
     // Use ethers.js keccak256 - the proper Ethereum implementation
     return keccak256(toUtf8Bytes(input));
   };
   
   // Utility function to calculate block hash (PoS style)
-  const calculateBlockHash = async (block, data, prevHash, validator) => {
+  const calculateBlockHash = async (block: number, data: string, prevHash: string, validator: string) => {
     const input = `${block}${data}${prevHash}${validator}`;
     return await calculateHash(input);
   };
   
   // Select validator based on stake (simplified algorithm)
-  const selectValidatorForSlot = (slotNumber) => {
+  const selectValidatorForSlot = (slotNumber: number) => {
     const activeValidators = validators.filter(v => v.isActive);
     const totalStake = activeValidators.reduce((sum, v) => sum + v.stake, 0);
     
@@ -196,7 +259,7 @@ const EthereumPoSDemo = () => {
   }, [hashData, currentTab]);
   
   
-  const handleBlockchainDataChange = async (index, newData) => {
+  const handleBlockchainDataChange = async (index: number, newData: string) => {
     const updatedBlockchain = [...blockchain];
     
     // Update the data in the changed block
@@ -252,7 +315,7 @@ const EthereumPoSDemo = () => {
   };
 
   // Handle block signing - only sign the specific block clicked
-  const handleValidateBlock = async (index) => {
+  const handleValidateBlock = async (index: number) => {
     const updatedBlockchain = [...blockchain];
     const blockToSign = updatedBlockchain[index];
     
@@ -357,7 +420,7 @@ const EthereumPoSDemo = () => {
     );
   };
 
-  const handleVoteBlock = (validatorName, voteType) => {
+  const handleVoteBlock = (validatorName: string, voteType: 'approve' | 'reject') => {
     if (!pendingProposal) return;
     
     if (validatorVotes[validatorName]) {
@@ -383,26 +446,26 @@ const EthereumPoSDemo = () => {
     // Calculate vote results
     const activeValidators = validators.filter(v => v.isActive);
     const totalStake = activeValidators.reduce((sum, v) => sum + v.stake, 0);
-    const allVotes = Object.values(updatedVotes);
-    const yesVotes = allVotes.filter(v => v.voteType === 'yes');
-    const noVotes = allVotes.filter(v => v.voteType === 'no');
+    const allVotes = Object.values(updatedVotes).filter((v): v is Vote => v !== null);
+    const yesVotes = allVotes.filter(v => v.voteType === 'approve');
+    const noVotes = allVotes.filter(v => v.voteType === 'reject');
     const yesStake = yesVotes.reduce((sum, v) => sum + v.stake, 0);
     const noStake = noVotes.reduce((sum, v) => sum + v.stake, 0);
-    const votedStake = yesStake + noStake;
+    // const votedStake = yesStake + noStake;
 
     // Check if majority of YES votes are malicious
     const maliciousYesStake = yesVotes
       .filter(v => v.isMalicious)
       .reduce((sum, v) => sum + v.stake, 0);
-    const maliciousNoStake = noVotes
-      .filter(v => v.isMalicious)
-      .reduce((sum, v) => sum + v.stake, 0);
+    // const maliciousNoStake = noVotes
+    //   .filter(v => v.isMalicious)
+    //   .reduce((sum, v) => sum + v.stake, 0);
     const proposerValidator = validators.find(v => `${v.name} (${v.address})` === pendingProposal.proposer);
     const proposerMalicious = proposerValidator?.isMalicious || false;
     
     // If proposer is malicious and we have yes votes, count their stake too
-    const totalMaliciousYesStake = maliciousYesStake + (proposerMalicious && yesStake > 0 ? proposerValidator.stake : 0);
-    const isMajorityMalicious = totalMaliciousYesStake > (yesStake + (proposerMalicious && yesStake > 0 ? proposerValidator.stake : 0)) / 2;
+    const totalMaliciousYesStake = maliciousYesStake + (proposerMalicious && yesStake > 0 ? (proposerValidator?.stake || 0) : 0);
+    const isMajorityMalicious = totalMaliciousYesStake > (yesStake + (proposerMalicious && yesStake > 0 ? (proposerValidator?.stake || 0) : 0)) / 2;
 
     const yesPercentage = ((yesStake / totalStake) * 100).toFixed(1);
     const noPercentage = ((noStake / totalStake) * 100).toFixed(1);
@@ -444,23 +507,23 @@ const EthereumPoSDemo = () => {
     }
   };
 
-  const finalizeBlock = async (proposal, isMalicious = false) => {
+  const finalizeBlock = async (proposal: Proposal, isMalicious: boolean = false) => {
     // Calculate consensus percentage based on YES votes
     const activeValidators = validators.filter(v => v.isActive);
     const totalStake = activeValidators.reduce((sum, v) => sum + v.stake, 0);
-    const yesVotes = Object.values(validatorVotes).filter(v => v.voteType === 'yes');
+    const yesVotes = Object.values(validatorVotes).filter((v): v is Vote => v !== null && v.voteType === 'approve');
     const yesStake = yesVotes.reduce((sum, v) => sum + v.stake, 0);
     const consensusPercentage = Math.round((yesStake / totalStake) * 100);
 
     // Add the finalized block to all validator blockchains
     const newBlock = {
-      blockNumber: proposal.blockNumber,
+      block: proposal.blockNumber,
       data: proposal.data,
       prevHash: proposal.prevHash,
       hash: proposal.hash,
       signedHash: proposal.hash,
       validator: proposal.proposer,
-      attestations: yesVotes,
+      attestations: yesVotes.length,
       finalized: true,
       attested: true,
       isValid: true,

@@ -1,20 +1,54 @@
 import { useState } from 'react';
-import { useToast } from './Toast.jsx';
+import { useToast } from './Toast';
 
-const StakingSlashing = ({ currentTab, validators, setValidators }) => {
+// Type definitions
+interface Validator {
+  id: string;
+  address: string;
+  name: string;
+  stake: number;
+  isActive: boolean;
+  isMalicious: boolean;
+  slashingRisk: number;
+  rewards: number;
+  uptime: number;
+}
+
+interface WithdrawalQueueItem {
+  validator: string;
+  amount: number;
+  position: number;
+  estimatedTime: string;
+}
+
+interface SlashingEvent {
+  validator: string;
+  offense: string;
+  penalty: string;
+  timestamp: string;
+  status: string;
+}
+
+interface StakingSlashingProps {
+  currentTab: string;
+  validators: Validator[];
+  setValidators: (validators: Validator[]) => void;
+}
+
+const StakingSlashing = ({ currentTab, validators, setValidators }: StakingSlashingProps) => {
   // Get toast functions from context
   const { showSuccess, showError, showWarning, showInfo } = useToast();
   
   // Staking state
   const [newValidatorName, setNewValidatorName] = useState('');
   // Removed unused staking state variables
-  const [withdrawalQueue, setWithdrawalQueue] = useState([
+  const [withdrawalQueue, setWithdrawalQueue] = useState<WithdrawalQueueItem[]>([
     { validator: 'Charlie', amount: 64.0, position: 1, estimatedTime: '2 days' },
     { validator: 'Bob', amount: 32.0, position: 2, estimatedTime: '4 days' }
   ]);
 
   // Slashing state
-  const [slashingEvents, setSlashingEvents] = useState([
+  const [slashingEvents, setSlashingEvents] = useState<SlashingEvent[]>([
     { 
       validator: 'Diana', 
       offense: 'Double Voting', 
@@ -37,6 +71,7 @@ const StakingSlashing = ({ currentTab, validators, setValidators }) => {
   const handleAddValidator = () => {
     if (newValidatorName) {
       const newValidator = {
+        id: Math.random().toString(16).substring(2, 8),
         address: `0x${Math.random().toString(16).substring(2, 8)}...`,
         name: newValidatorName,
         stake: 32.0, // Always exactly 32 ETH
@@ -65,7 +100,7 @@ const StakingSlashing = ({ currentTab, validators, setValidators }) => {
   };
 
   // Toggle malicious status
-  const toggleMaliciousStatus = (validatorName) => {
+  const toggleMaliciousStatus = (validatorName: string) => {
     const updatedValidators = validators.map(validator => 
       validator.name === validatorName
         ? { ...validator, isMalicious: !validator.isMalicious }
@@ -74,7 +109,7 @@ const StakingSlashing = ({ currentTab, validators, setValidators }) => {
     setValidators(updatedValidators);
     
     const validator = validators.find(v => v.name === validatorName);
-    const newStatus = !validator.isMalicious;
+    const newStatus = !validator?.isMalicious;
     
     setTimeout(() => {
       if (newStatus) {
@@ -91,7 +126,7 @@ const StakingSlashing = ({ currentTab, validators, setValidators }) => {
     }, 100);
   };
 
-  const handleWithdraw = (validatorName, amount) => {
+  const handleWithdraw = (validatorName: string, amount: number) => {
     const newWithdrawal = {
       validator: validatorName,
       amount: amount,
@@ -156,7 +191,7 @@ const StakingSlashing = ({ currentTab, validators, setValidators }) => {
   };
 
   // Toggle validator active status
-  const toggleValidatorStatus = (validatorName) => {
+  const toggleValidatorStatus = (validatorName: string) => {
     const updatedValidators = validators.map(validator => 
       validator.name === validatorName
         ? { ...validator, isActive: !validator.isActive }
@@ -165,7 +200,7 @@ const StakingSlashing = ({ currentTab, validators, setValidators }) => {
     setValidators(updatedValidators);
     
     const validator = validators.find(v => v.name === validatorName);
-    const newStatus = !validator.isActive;
+    const newStatus = !validator?.isActive;
     
     setTimeout(() => {
       showInfo(
@@ -264,7 +299,8 @@ const StakingSlashing = ({ currentTab, validators, setValidators }) => {
                   <button
                     onClick={() => {
                       setNewValidatorName('');
-                      document.querySelector('input[placeholder="Enter validator name"]').focus();
+                      const input = document.querySelector('input[placeholder="Enter validator name"]') as HTMLInputElement;
+                      input?.focus();
                     }}
                     className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md transition-colors"
                   >

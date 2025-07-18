@@ -1,8 +1,20 @@
-// src/components/Navigation.jsx
+// src/components/Navigation.tsx
 import { Wallet, ArrowRightLeft, Image, Coins } from 'lucide-react';
 
-const Navigation = ({ demos, currentDemo, goToDemo }) => {
-  const getIcon = (demoId) => {
+interface Demo {
+  id: string;
+  title: string;
+  description: string;
+}
+
+interface NavigationProps {
+  demos: Demo[];
+  currentDemo: number;
+  goToDemo: (index: number) => void;
+}
+
+const Navigation = ({ demos, currentDemo, goToDemo }: NavigationProps) => {
+  const getIcon = (demoId: string): React.ReactNode => {
     switch (demoId) {
       case 'wallet': return <Wallet className="w-5 h-5" />;
       case 'dex': return <ArrowRightLeft className="w-5 h-5" />;

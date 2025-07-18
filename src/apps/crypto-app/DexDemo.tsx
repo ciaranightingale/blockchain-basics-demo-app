@@ -1,24 +1,51 @@
-// src/demos/DexDemo.jsx
-import React, { useState, useEffect } from 'react';
-import { ArrowRightLeft, TrendingUp, Settings, Info, ChevronDown } from 'lucide-react';
+// src/demos/DexDemo.tsx
+import { useState, useEffect } from 'react';
+import { ArrowRightLeft, Settings, Info, ChevronDown } from 'lucide-react';
 import TransactionModal from './TransactionModal';
 import { useToast } from './Toast';
 
-const DexDemo = ({ onActionCompleted }) => {
-  const [fromToken, setFromToken] = useState('ETH');
-  const [toToken, setToToken] = useState('USDC');
-  const [fromAmount, setFromAmount] = useState('');
-  const [toAmount, setToAmount] = useState('');
-  const [slippage, setSlippage] = useState('0.5');
-  const [showSettings, setShowSettings] = useState(false);
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [isSwapping, setIsSwapping] = useState(false);
-  const [transactionData, setTransactionData] = useState(null);
+interface Token {
+  name: string;
+  symbol: string;
+  price: number;
+  balance: number;
+  decimals: number;
+  color: string;
+}
+
+interface TokenBalances {
+  [key: string]: Token;
+}
+
+interface TransactionData {
+  from: string;
+  to: string;
+  action: string;
+  amount: string;
+  fee: string;
+  total: string;
+  details: string[];
+}
+
+interface DexDemoProps {
+  onActionCompleted: (action: string) => void;
+}
+
+const DexDemo = ({ onActionCompleted }: DexDemoProps) => {
+  const [fromToken, setFromToken] = useState<string>('ETH');
+  const [toToken, setToToken] = useState<string>('USDC');
+  const [fromAmount, setFromAmount] = useState<string>('');
+  const [toAmount, setToAmount] = useState<string>('');
+  const [slippage, setSlippage] = useState<string>('0.5');
+  const [showSettings, setShowSettings] = useState<boolean>(false);
+  const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
+  const [isSwapping, setIsSwapping] = useState<boolean>(false);
+  const [transactionData, setTransactionData] = useState<TransactionData | null>(null);
 
   const { showToast, ToastComponent } = useToast();
 
   // Mock token data with balances
-  const [tokenBalances, setTokenBalances] = useState({
+  const [tokenBalances, setTokenBalances] = useState<TokenBalances>({
     ETH: { name: 'Ethereum', symbol: 'ETH', price: 2500, balance: 1.5, decimals: 18, color: 'text-purple-600' },
     USDC: { name: 'USD Coin', symbol: 'USDC', price: 1, balance: 3750, decimals: 6, color: 'text-blue-600' },
     BTC: { name: 'Bitcoin', symbol: 'BTC', price: 45000, balance: 0.05, decimals: 8, color: 'text-orange-600' },
@@ -40,7 +67,7 @@ const DexDemo = ({ onActionCompleted }) => {
     }
   }, [fromAmount, fromToken, toToken, slippage, tokenBalances]);
 
-  const swapTokens = () => {
+  const swapTokens = (): void => {
     const tempToken = fromToken;
     const tempAmount = fromAmount;
     setFromToken(toToken);
@@ -49,7 +76,7 @@ const DexDemo = ({ onActionCompleted }) => {
     setToAmount(tempAmount);
   };
 
-  const handleSwap = () => {
+  const handleSwap = (): void => {
     const amount = parseFloat(fromAmount);
     
     if (!fromAmount || amount <= 0) {
@@ -83,7 +110,7 @@ const DexDemo = ({ onActionCompleted }) => {
     setShowConfirmModal(true);
   };
 
-  const executeSwap = () => {
+  const executeSwap = (): void => {
     setIsSwapping(true);
     setTimeout(() => {
       const fromAmountNum = parseFloat(fromAmount);
@@ -120,8 +147,8 @@ const DexDemo = ({ onActionCompleted }) => {
     }, 2000);
   };
 
-  const TokenSelector = ({ selectedToken, onSelect, label }) => {
-    const [isOpen, setIsOpen] = useState(false);
+  const TokenSelector = ({ selectedToken, onSelect }: { selectedToken: string; onSelect: (token: string) => void; label: string }) => {
+    const [isOpen, setIsOpen] = useState<boolean>(false);
     
     return (
       <div className="relative">

@@ -1,17 +1,49 @@
-// src/demos/NFTDemo.jsx
+// src/demos/NFTDemo.tsx
 import React, { useState } from 'react';
 import { Image, Heart, Eye, ShoppingCart, Wallet, Filter, Search } from 'lucide-react';
 import TransactionModal from './TransactionModal';
 import { useToast } from './Toast';
 
+interface NFTAttribute {
+  trait_type: string;
+  value: string;
+}
+
+interface NFT {
+  id: number;
+  name: string;
+  image: string;
+  price: string;
+  priceUSD: string;
+  creator: string;
+  owner: string;
+  category: string;
+  rarity: string;
+  views: number;
+  likes: number;
+  description: string;
+  attributes: NFTAttribute[];
+}
+
+interface TransactionData {
+  from: string;
+  to: string;
+  action: string;
+  price: string;
+  fee: string;
+  total: string;
+  details: string[];
+  customContent?: React.ReactNode;
+}
+
 const NFTDemo = () => {
-  const [selectedNFT, setSelectedNFT] = useState(null);
-  const [showBuyModal, setShowBuyModal] = useState(false);
-  const [filter, setFilter] = useState('all');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [likedNFTs, setLikedNFTs] = useState(new Set());
-  const [transactionData, setTransactionData] = useState(null);
-  const [isPurchasing, setIsPurchasing] = useState(false);
+  const [selectedNFT, setSelectedNFT] = useState<NFT | null>(null);
+  const [showBuyModal, setShowBuyModal] = useState<boolean>(false);
+  const [filter, setFilter] = useState<string>('all');
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [likedNFTs, setLikedNFTs] = useState<Set<number>>(new Set());
+  const [transactionData, setTransactionData] = useState<TransactionData | null>(null);
+  const [isPurchasing, setIsPurchasing] = useState<boolean>(false);
 
   const { showToast, ToastComponent } = useToast();
 
@@ -133,7 +165,7 @@ const NFTDemo = () => {
     }
   ];
 
-  const toggleLike = (nftId) => {
+  const toggleLike = (nftId: number): void => {
     const newLikedNFTs = new Set(likedNFTs);
     if (newLikedNFTs.has(nftId)) {
       newLikedNFTs.delete(nftId);
@@ -150,7 +182,7 @@ const NFTDemo = () => {
     return matchesFilter && matchesSearch;
   });
 
-  const handleBuyNFT = (nft) => {
+  const handleBuyNFT = (nft: NFT): void => {
     setSelectedNFT(nft);
     
     // Prepare transaction data
@@ -180,14 +212,14 @@ const NFTDemo = () => {
     setShowBuyModal(true);
   };
 
-  const executePurchase = () => {
+  const executePurchase = (): void => {
     setIsPurchasing(true);
     setTimeout(() => {
       setIsPurchasing(false);
       setShowBuyModal(false);
       
       showToast(
-        `${selectedNFT.name} has been added to your wallet!`,
+        `${selectedNFT?.name || 'NFT'} has been added to your wallet!`,
         'success',
         'NFT Purchase Successful! 🖼️'
       );
@@ -197,7 +229,7 @@ const NFTDemo = () => {
     }, 2000);
   };
 
-  const NFTCard = ({ nft }) => (
+  const NFTCard = ({ nft }: { nft: NFT }) => (
     <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
       <div className="relative group">
         <img

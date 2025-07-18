@@ -1,8 +1,21 @@
-// src/components/ProgressIndicator.jsx
-import React from 'react';
+// src/components/ProgressIndicator.tsx
 import { ChevronLeft, ChevronRight, Check } from 'lucide-react';
 
-const ProgressIndicator = ({ demos, currentDemo, nextDemo, prevDemo, getDemoCompletionStatus }) => {
+interface Demo {
+  id: string;
+  title: string;
+  description: string;
+}
+
+interface ProgressIndicatorProps {
+  demos: Demo[];
+  currentDemo: number;
+  nextDemo: () => void;
+  prevDemo: () => void;
+  getDemoCompletionStatus: (demoId: string) => boolean;
+}
+
+const ProgressIndicator = ({ demos, currentDemo, nextDemo, prevDemo, getDemoCompletionStatus }: ProgressIndicatorProps) => {
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg">
       <div className="max-w-7xl mx-auto px-4 py-4">
