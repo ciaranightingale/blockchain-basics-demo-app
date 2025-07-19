@@ -151,8 +151,8 @@ function DecentralizedTab({
                     const activeValidators = validators.filter(v => v.isActive);
                     const totalStake = activeValidators.reduce((sum, v) => sum + v.stake, 0);
                     const allVotes = Object.values(validatorVotes || {});
-                    const yesVotes = allVotes.filter(v => v.voteType === 'yes');
-                    const noVotes = allVotes.filter(v => v.voteType === 'no');
+                    const yesVotes = allVotes.filter(v => v.voteType === 'approve');
+                    const noVotes = allVotes.filter(v => v.voteType === 'reject');
                     const yesStake = yesVotes.reduce((sum, v) => sum + v.stake, 0);
                     const noStake = noVotes.reduce((sum, v) => sum + v.stake, 0);
                     const requiredStake = (totalStake * 2) / 3;
@@ -281,7 +281,7 @@ function DecentralizedTab({
                       </div>
                     ) : (
                       <div className={`w-full py-2 px-3 text-xs font-medium rounded text-center ${
-                        validatorVotes[validator.name].voteType === 'yes'
+                        validatorVotes[validator.name].voteType === 'approve'
                           ? 'bg-green-500 text-white'
                           : 'bg-red-500 text-white'
                       }`}>
