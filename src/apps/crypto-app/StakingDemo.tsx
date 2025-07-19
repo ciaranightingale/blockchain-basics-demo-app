@@ -444,12 +444,6 @@ const StakingDemo = ({ onActionCompleted }: StakingDemoProps) => {
   return (
     <div className="p-6">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-8">
-          <Coins className="w-16 h-16 text-green-600 mx-auto mb-4" />
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">DeFi Staking</h1>
-          <p className="text-gray-600">Stake your tokens and earn passive rewards</p>
-        </div>
-
         {/* Portfolio Overview */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-xl shadow-lg p-6">

@@ -8,9 +8,9 @@ import EcdsaApp from './apps/ecdsa-demo/EcdsaApp';
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
         <Navigation />
-        <main className="container mx-auto px-4 py-8">
+        <main>
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/blockchain" element={<BlockchainApp />} />

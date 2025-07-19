@@ -212,11 +212,6 @@ const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
   return (
     <div className="p-6">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Crypto Wallet Demo</h1>
-          <p className="text-gray-600">Experience MetaMask-style transactions in a safe sandbox environment</p>
-        </div>
-
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           <WalletCard 
             wallet={walletA} 

@@ -191,12 +191,6 @@ const DexDemo = ({ onActionCompleted }: DexDemoProps) => {
   return (
     <div className="p-6">
       <div className="max-w-lg mx-auto">
-        <div className="text-center mb-8">
-          <ArrowRightLeft className="w-16 h-16 text-blue-600 mx-auto mb-4" />
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">DEX Trading</h1>
-          <p className="text-gray-600">Swap tokens instantly with low fees</p>
-        </div>
-
         <div className="bg-white rounded-xl shadow-lg p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-gray-900">Swap Tokens</h2>
