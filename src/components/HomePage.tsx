@@ -27,15 +27,16 @@ const HomePage = () => {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold text-center mb-2 text-gray-800">
-        Blockchain Learning Hub
-      </h1>
-      <p className="text-center text-gray-600 mb-8">
-        Interactive demonstrations to learn blockchain technology, cryptography, and decentralized finance
-      </p>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-4xl font-bold text-center mb-2 text-gray-800">
+          Blockchain Learning Hub
+        </h1>
+        <p className="text-center text-gray-600 mb-8">
+          Interactive demonstrations to learn blockchain technology, cryptography, and decentralized finance
+        </p>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
         {apps.map((app) => (
           <Link
             key={app.path}
@@ -62,6 +63,7 @@ const HomePage = () => {
             </div>
           </Link>
         ))}
+        </div>
       </div>
     </div>
   );
