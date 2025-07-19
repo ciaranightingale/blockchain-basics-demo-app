@@ -31,37 +31,37 @@ const Navigation = ({ demos, currentDemo, goToDemo }: NavigationProps) => {
           <div className="flex items-center space-x-2">
             <div className="rounded-lg flex items-center justify-center">
               <img 
-                src="src/assets/cyfrin.png" 
-                alt="DeFi Logo" 
-                className="w-8"
+                src="/cyfrin.png" 
+                alt="Cyfrin Logo" 
+                className="w-8 h-auto"
               />
+              <h1 className="text-xl font-bold text-gray-900">Blockchain Demo Suite</h1>
             </div>
-            <h1 className="text-xl font-bold text-gray-900">Blockchain Demo Suite</h1>
-          </div>
           
-          <div className="hidden md:flex space-x-1">
-            {demos.map((demo, index) => (
-              <button
-                key={demo.id}
-                onClick={() => goToDemo(index)}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
-                  currentDemo === index
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                {getIcon(demo.id)}
-                <span className="font-medium">{demo.title}</span>
-              </button>
-            ))}
-          </div>
+            <div className="hidden md:flex space-x-1">
+              {demos.map((demo, index) => (
+                <button
+                  key={demo.id}
+                  onClick={() => goToDemo(index)}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
+                    currentDemo === index
+                      ? 'bg-blue-600 text-white'
+                      : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  {getIcon(demo.id)}
+                  <span className="font-medium">{demo.title}</span>
+                </button>
+              ))}
+            </div>
 
-          <div className="md:hidden">
-            <div className="flex items-center space-x-2">
-              {getIcon(demos[currentDemo].id)}
-              <span className="font-medium text-gray-900">
-                {demos[currentDemo].title}
-              </span>
+            <div className="md:hidden">
+              <div className="flex items-center space-x-2">
+                {getIcon(demos[currentDemo].id)}
+                <span className="font-medium text-gray-900">
+                  {demos[currentDemo].title}
+                </span>
+              </div>
             </div>
           </div>
         </div>

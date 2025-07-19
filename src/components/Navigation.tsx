@@ -19,7 +19,7 @@ const Navigation = () => {
             <img 
               src="/src/assets/cyfrin.png" 
               alt="Cyfrin Logo" 
-              className="h-8 w-8"
+              className="w-8"
             />
             <span className="text-xl font-bold text-gray-800">
               Blockchain Learning Hub
