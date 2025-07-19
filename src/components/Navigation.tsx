@@ -17,7 +17,7 @@ const Navigation = () => {
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="flex items-center space-x-3">
             <img 
-              src="/src/assets/cyfrin.png" 
+              src="/cyfrin.png" 
               alt="Cyfrin Logo" 
               className="w-8"
             />
