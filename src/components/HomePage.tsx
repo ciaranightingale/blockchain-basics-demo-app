@@ -65,19 +65,6 @@ const HomePage = () => {
           </Link>
         ))}
       </div>
-
-      <div className="mt-16 text-center">
-        <div className="bg-white rounded-lg shadow-md p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            About This Hub
-          </h2>
-          <p className="text-gray-600 max-w-3xl mx-auto">
-            This learning hub provides hands-on demonstrations of blockchain technology concepts. 
-            Each application focuses on different aspects of the blockchain ecosystem, from basic 
-            blockchain mechanics to advanced cryptographic concepts and DeFi interactions.
-          </p>
-        </div>
-      </div>
     </div>
   );
 };
