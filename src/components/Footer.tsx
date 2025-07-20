@@ -7,7 +7,7 @@ interface FooterProps {
   inspirationText?: string;
 }
 
-export default function Footer({ title, description, inspirationUrl, inspirationText }: FooterProps) {
+export default function Footer({ title, inspirationUrl, inspirationText }: FooterProps) {
   return (
     <footer className="bg-white dark:bg-gray-800 text-gray-800 dark:text-white py-8 mt-12 border-t border-gray-200 dark:border-gray-700">
       <div className="max-w-6xl mx-auto px-4">
