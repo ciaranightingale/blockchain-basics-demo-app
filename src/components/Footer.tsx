@@ -2,7 +2,6 @@ import { AlertTriangle } from 'lucide-react';
 
 interface FooterProps {
   title: string;
-  description: string;
   inspirationUrl?: string;
   inspirationText?: string;
 }

@@ -1,6 +1,6 @@
 // src/demos/StakingDemo.jsx
 import { useState } from 'react';
-import { Coins, PiggyBank, TrendingUp, Clock, Award, Plus, Minus } from 'lucide-react';
+import { PiggyBank, TrendingUp, Clock, Award, Plus, Minus } from 'lucide-react';
 import TransactionModal from './TransactionModal';
 import { useToast } from './Toast';
 
