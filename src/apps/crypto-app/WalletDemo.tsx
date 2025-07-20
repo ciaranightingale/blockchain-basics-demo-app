@@ -186,7 +186,7 @@ const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Private Key</label>
           <div className="flex items-center space-x-2">
-            <div className="flex-1 p-2 bg-gray-50 dark:bg-gray-600 rounded border dark:border-gray-600 font-mono text-xs sm:text-sm text-gray-900 dark:text-white break-all">
+            <div className="flex-1 p-2 bg-gray-50 dark:bg-gray-600 rounded border dark:border-gray-600 font-mono text-xs sm:text-sm text-gray-900 dark:text-white break-all overflow-hidden min-w-0">
               {wallet.showPrivateKey ? wallet.privateKey : '••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••'}
             </div>
             <button

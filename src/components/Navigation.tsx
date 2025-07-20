@@ -24,7 +24,7 @@ const Navigation = () => {
             <img 
               src={isDarkMode ? "/cyfrin-white.png" : "/cyfrin.png"}
               alt="Cyfrin Logo" 
-              className="w-8"
+              className="w-8 h-8 object-contain"
             />
             <span className="text-xl font-bold text-gray-800 dark:text-white hidden sm:block">
               Blockchain Learning Hub
