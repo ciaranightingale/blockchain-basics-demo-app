@@ -35,21 +35,21 @@ export default function SignatureVerifier({ publicKeys }: SignatureVerifierProps
 
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-8 border border-gray-200">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 border border-gray-200 dark:border-gray-700">
       <div className="flex items-center gap-4 mb-8">
         <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0">
           <span className="text-white font-bold text-lg">5</span>
         </div>
-        <h2 className="text-2xl font-bold text-gray-800">Verify Signature</h2>
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Verify Signature</h2>
       </div>
 
       {publicKeys.length === 0 ? (
-        <div className="text-center py-8 text-gray-600">
+        <div className="text-center py-8 text-gray-600 dark:text-gray-300">
           <p>Generate a public key first to verify signatures</p>
         </div>
       ) : (
         <div className="space-y-6">
-          <div className="text-sm text-gray-600 mb-4">
+          <div className="text-sm text-gray-600 dark:text-gray-300 mb-4">
             <p>Verify signatures using the original message and public key:</p>
             <ul className="list-disc list-inside mt-2 space-y-1">
               <li>Enter the exact message that was signed</li>
@@ -59,43 +59,43 @@ export default function SignatureVerifier({ publicKeys }: SignatureVerifierProps
           </div>
 
           <div className="space-y-4">
-          <label className="block text-sm font-medium text-blue-600">
+          <label className="block text-sm font-medium text-blue-600 dark:text-blue-400">
             Original Message:
           </label>
           <textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            className="w-full p-4 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700 placeholder-gray-500"
+            className="w-full p-4 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent text-gray-700 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
             rows={4}
             placeholder="Enter the original message that was signed..."
           />
         </div>
 
         <div className="space-y-4">
-          <label className="block text-sm font-medium text-blue-600">
+          <label className="block text-sm font-medium text-blue-600 dark:text-blue-400">
             Signature:
           </label>
           <input
             type="text"
             value={signature}
             onChange={(e) => setSignature(e.target.value)}
-            className="w-full p-4 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm text-gray-700 placeholder-gray-500"
+            className="w-full p-4 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent font-mono text-sm text-gray-700 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
             placeholder="Enter the signature to verify..."
           />
         </div>
 
         <div className="space-y-4">
-          <label className="block text-sm font-medium text-blue-600">
+          <label className="block text-sm font-medium text-blue-600 dark:text-blue-400">
             Public Key for Verification:
           </label>
           {publicKeys.length > 0 ? (
-            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-              <div className="font-mono text-sm break-all text-gray-700">
+            <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+              <div className="font-mono text-sm break-all text-gray-700 dark:text-gray-300">
                 {publicKeys[0].key}
               </div>
             </div>
           ) : (
-            <div className="text-gray-600 text-sm bg-gray-50 p-4 rounded-lg">
+            <div className="text-gray-600 dark:text-gray-300 text-sm bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
               No public key available. Generate a public key first.
             </div>
           )}
@@ -105,13 +105,13 @@ export default function SignatureVerifier({ publicKeys }: SignatureVerifierProps
           <button
             onClick={handleVerify}
             disabled={!message || !signature || publicKeys.length === 0 || isVerifying}
-            className="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-6 rounded-md transition-colors duration-200 border border-blue-500 hover:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-500 disabled:hover:border-blue-500"
+            className="flex-1 bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-md transition-colors duration-200 border border-blue-500 hover:border-blue-600 dark:border-blue-600 dark:hover:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-500 disabled:hover:border-blue-500 dark:disabled:hover:bg-blue-600 dark:disabled:hover:border-blue-600"
           >
             {isVerifying ? 'Verifying...' : 'Verify Signature'}
           </button>
           <button
             onClick={resetVerification}
-            className="bg-gray-500 hover:bg-gray-600 text-white font-medium py-3 px-6 rounded-md transition-colors duration-200 border border-gray-500 hover:border-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+            className="bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-700 text-white font-medium py-3 px-6 rounded-md transition-colors duration-200 border border-gray-500 hover:border-gray-600 dark:border-gray-600 dark:hover:border-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 dark:focus:ring-gray-400 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
           >
             Reset
           </button>
@@ -120,8 +120,8 @@ export default function SignatureVerifier({ publicKeys }: SignatureVerifierProps
         {verificationResult !== null && (
           <div className={`p-4 rounded-lg border-2 ${
             verificationResult 
-              ? 'bg-green-50 border-green-200 text-green-700' 
-              : 'bg-red-50 border-red-200 text-red-700'
+              ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 text-green-700 dark:text-green-300' 
+              : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300'
           }`}>
             <div className="flex items-center gap-3">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
@@ -133,7 +133,7 @@ export default function SignatureVerifier({ publicKeys }: SignatureVerifierProps
               </div>
               <div>
                 <p className={`font-bold text-lg ${
-                  verificationResult ? 'text-green-600' : 'text-red-600'
+                  verificationResult ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
                 }`}>
                   {verificationResult ? 'Signature Valid!' : 'Signature Invalid!'}
                 </p>
@@ -147,13 +147,13 @@ export default function SignatureVerifier({ publicKeys }: SignatureVerifierProps
           </div>
         )}
 
-        <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+        <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
           <div className="flex items-start gap-3">
             <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
               <span className="text-white text-sm font-bold">i</span>
             </div>
-            <div className="text-sm text-gray-600">
-              <p className="font-medium mb-1 text-blue-600">How signature verification works:</p>
+            <div className="text-sm text-gray-600 dark:text-gray-300">
+              <p className="font-medium mb-1 text-blue-600 dark:text-blue-400">How signature verification works:</p>
               <ul className="list-disc list-inside space-y-1 text-xs">
                 <li>The message is hashed using keccak256</li>
                 <li>The signature is verified against the hash and public key</li>

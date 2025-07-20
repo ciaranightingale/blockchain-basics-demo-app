@@ -142,18 +142,18 @@ const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
   };
 
   const WalletCard = ({ wallet, walletName, isActive }: { wallet: WalletState; walletName: 'A' | 'B'; isActive: boolean }) => (
-    <div className={`bg-white rounded-xl shadow-lg p-6 border-2 transition-all ${
-      isActive ? 'border-blue-500 shadow-xl' : 'border-gray-200'
+    <div className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border-2 transition-all ${
+      isActive ? 'border-blue-500 shadow-xl' : 'border-gray-200 dark:border-gray-700'
     }`}>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-2">
           <Wallet className="w-6 h-6 text-blue-600" />
-          <h3 className="text-lg font-semibold">Wallet {walletName}</h3>
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-white">Wallet {walletName}</h3>
         </div>
         <button
           onClick={() => setActiveWallet(walletName)}
           className={`px-3 py-1 rounded-full text-sm font-medium ${
-            isActive ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            isActive ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500'
           }`}
         >
           {isActive ? 'Active' : 'Select'}
@@ -162,14 +162,14 @@ const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
 
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Address</label>
           <div className="flex items-center space-x-2">
-            <div className="flex-1 p-2 bg-gray-50 rounded border font-mono text-sm">
+            <div className="flex-1 p-2 bg-gray-50 dark:bg-gray-600 rounded border dark:border-gray-600 font-mono text-xs sm:text-sm text-gray-900 dark:text-white break-all">
               {wallet.address}
             </div>
             <button
               onClick={() => copyToClipboard(wallet.address, `address-${walletName}`)}
-              className="p-2 text-gray-500 hover:text-blue-600"
+              className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 flex-shrink-0"
             >
               {copied === `address-${walletName}` ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
             </button>
@@ -177,28 +177,28 @@ const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Balance</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Balance</label>
           <div className="text-2xl font-bold text-green-600">
             {wallet.balance.toFixed(4)} ETH
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Private Key</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Private Key</label>
           <div className="flex items-center space-x-2">
-            <div className="flex-1 p-2 bg-gray-50 rounded border font-mono text-sm">
+            <div className="flex-1 p-2 bg-gray-50 dark:bg-gray-600 rounded border dark:border-gray-600 font-mono text-xs sm:text-sm text-gray-900 dark:text-white break-all">
               {wallet.showPrivateKey ? wallet.privateKey : '••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••'}
             </div>
             <button
               onClick={() => togglePrivateKey(walletName)}
-              className="p-2 text-gray-500 hover:text-blue-600"
+              className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 flex-shrink-0"
             >
               {wallet.showPrivateKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
             {wallet.showPrivateKey && (
               <button
                 onClick={() => copyToClipboard(wallet.privateKey, `key-${walletName}`)}
-                className="p-2 text-gray-500 hover:text-blue-600"
+                className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 flex-shrink-0"
               >
                 {copied === `key-${walletName}` ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
               </button>
@@ -210,9 +210,9 @@ const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
   );
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-6 sm:mb-8">
           <WalletCard 
             wallet={walletA} 
             walletName="A" 
@@ -238,13 +238,13 @@ const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
         {/* Send Transaction Modal */}
         {showTransactionModal && !transactionData && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto border dark:border-gray-700">
               <div className="p-6">
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-xl font-bold">Send Transaction</h3>
+                  <h3 className="text-xl font-bold text-gray-800 dark:text-white">Send Transaction</h3>
                   <button
                     onClick={() => setShowTransactionModal(false)}
-                    className="text-gray-400 hover:text-gray-600 text-xl"
+                    className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 text-xl"
                   >
                     ✕
                   </button>
@@ -252,22 +252,22 @@ const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
 
                 <div className="space-y-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">From Wallet</label>
-                    <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-                      <div className="font-medium text-blue-900">Wallet {activeWallet}</div>
-                      <div className="text-sm text-blue-700 font-mono">{currentWallet.address}</div>
-                      <div className="text-sm text-blue-700">Balance: {currentWallet.balance.toFixed(4)} ETH</div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">From Wallet</label>
+                    <div className="p-3 bg-blue-50 dark:bg-blue-900 rounded-lg border border-blue-200 dark:border-blue-700">
+                      <div className="font-medium text-blue-900 dark:text-blue-200">Wallet {activeWallet}</div>
+                      <div className="text-sm text-blue-700 dark:text-blue-300 font-mono">{currentWallet.address}</div>
+                      <div className="text-sm text-blue-700 dark:text-blue-300">Balance: {currentWallet.balance.toFixed(4)} ETH</div>
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Recipient Address</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Recipient Address</label>
                     <input
                       type="text"
                       value={recipient}
                       onChange={(e) => setRecipient(e.target.value)}
                       placeholder={targetWallet.address}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
+                      className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     />
                     <div className="mt-2 text-sm text-gray-500">
                       Leave empty to send to Wallet {activeWallet === 'A' ? 'B' : 'A'}
@@ -275,46 +275,46 @@ const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Amount (ETH)</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Amount (ETH)</label>
                     <input
                       type="number"
                       value={sendAmount}
                       onChange={(e) => setSendAmount(e.target.value)}
                       placeholder="0.0"
                       step="0.0001"
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg"
+                      className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     />
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Gas Price (Gwei)</label>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Gas Price (Gwei)</label>
                       <input
                         type="number"
                         value={gasPrice}
                         onChange={(e) => setGasPrice(e.target.value)}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Gas Limit</label>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Gas Limit</label>
                       <input
                         type="number"
                         value={gasLimit}
                         onChange={(e) => setGasLimit(e.target.value)}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                       />
                     </div>
                   </div>
 
-                  <div className="bg-gray-50 p-4 rounded-lg">
+                  <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
                     <div className="flex justify-between items-center text-sm">
-                      <span className="text-gray-600">Estimated Gas Fee:</span>
+                      <span className="text-gray-600 dark:text-gray-300">Estimated Gas Fee:</span>
                       <span className="font-medium">{calculateTransactionFee().toFixed(6)} ETH</span>
                     </div>
                     <div className="flex justify-between items-center text-sm mt-1">
-                      <span className="text-gray-600">Total (Amount + Fee):</span>
-                      <span className="font-bold text-lg">
+                      <span className="text-gray-600 dark:text-gray-300">Total (Amount + Fee):</span>
+                      <span className="font-bold text-lg text-gray-900 dark:text-white">
                         {sendAmount ? (parseFloat(sendAmount || '0') + calculateTransactionFee()).toFixed(6) : calculateTransactionFee().toFixed(6)} ETH
                       </span>
                     </div>
@@ -343,10 +343,10 @@ const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
         {/* Transaction Confirmation Modal */}
         {showTransactionModal && transactionData && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto border dark:border-gray-700">
               <div className="p-6">
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-xl font-bold">Confirm Transaction</h3>
+                  <h3 className="text-xl font-bold text-gray-800 dark:text-white">Confirm Transaction</h3>
                   <button
                     onClick={() => {
                       setShowTransactionModal(false);
@@ -367,30 +367,30 @@ const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
 
                   <div className="space-y-3">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">From:</span>
+                      <span className="text-gray-600 dark:text-gray-300">From:</span>
                       <span className="font-mono text-sm">{transactionData?.from}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">To:</span>
+                      <span className="text-gray-600 dark:text-gray-300">To:</span>
                       <span className="font-mono text-sm">{transactionData?.to}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Amount:</span>
+                      <span className="text-gray-600 dark:text-gray-300">Amount:</span>
                       <span className="font-bold">{transactionData?.value} ETH</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Gas Fee:</span>
+                      <span className="text-gray-600 dark:text-gray-300">Gas Fee:</span>
                       <span>{transactionData?.fee} ETH</span>
                     </div>
                     <div className="flex justify-between border-t pt-2">
-                      <span className="text-gray-600 font-medium">Total:</span>
-                      <span className="font-bold text-lg">{transactionData?.total} ETH</span>
+                      <span className="text-gray-600 dark:text-gray-300 font-medium">Total:</span>
+                      <span className="font-bold text-lg text-gray-900 dark:text-white">{transactionData?.total} ETH</span>
                     </div>
                   </div>
 
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <h4 className="font-medium mb-2">Transaction Data:</h4>
-                    <div className="text-xs font-mono bg-white p-2 rounded border">
+                  <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                    <h4 className="font-medium mb-2 text-gray-800 dark:text-white">Transaction Data:</h4>
+                    <div className="text-xs font-mono bg-white dark:bg-gray-600 p-2 rounded border dark:border-gray-600 text-gray-900 dark:text-white">
                       <div>Nonce: {transactionData?.nonce}</div>
                       <div>Gas Price: {transactionData?.gasPrice} Gwei</div>
                       <div>Gas Limit: {transactionData?.gasLimit}</div>

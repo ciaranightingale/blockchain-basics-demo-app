@@ -154,16 +154,16 @@ const DexDemo = ({ onActionCompleted }: DexDemoProps) => {
       <div className="relative">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center space-x-2 bg-gray-100 hover:bg-gray-200 rounded-lg px-3 py-2 transition-colors"
+          className="flex items-center space-x-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg px-2 sm:px-3 py-2 transition-colors min-w-0"
         >
-          <span className={`font-semibold ${tokenBalances[selectedToken].color}`}>
+          <span className={`font-semibold ${tokenBalances[selectedToken].color} text-sm sm:text-base`}>
             {selectedToken}
           </span>
-          <ChevronDown className="w-4 h-4 text-gray-500" />
+          <ChevronDown className="w-4 h-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
         </button>
         
         {isOpen && (
-          <div className="absolute top-full left-0 mt-1 bg-white rounded-lg shadow-lg border z-10 min-w-[150px]">
+          <div className="absolute top-full left-0 mt-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg border dark:border-gray-600 z-10 min-w-[150px]">
             {Object.entries(tokenBalances).map(([symbol, token]) => (
               <button
                 key={symbol}
@@ -171,13 +171,13 @@ const DexDemo = ({ onActionCompleted }: DexDemoProps) => {
                   onSelect(symbol);
                   setIsOpen(false);
                 }}
-                className="w-full text-left px-4 py-3 hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg flex items-center justify-between"
+                className="w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 first:rounded-t-lg last:rounded-b-lg flex items-center justify-between"
               >
                 <div>
                   <div className={`font-semibold ${token.color}`}>{symbol}</div>
-                  <div className="text-xs text-gray-500">{token.name}</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">{token.name}</div>
                 </div>
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-gray-600 dark:text-gray-300">
                   {token.balance.toFixed(4)}
                 </div>
               </button>
@@ -191,28 +191,28 @@ const DexDemo = ({ onActionCompleted }: DexDemoProps) => {
   return (
     <div className="p-6">
       <div className="max-w-lg mx-auto">
-        <div className="bg-white rounded-xl shadow-lg p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border dark:border-gray-700">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-gray-900">Swap Tokens</h2>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Swap Tokens</h2>
             <button
               onClick={() => setShowSettings(!showSettings)}
-              className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
             >
               <Settings className="w-5 h-5" />
             </button>
           </div>
 
           {showSettings && (
-            <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+            <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
               <div className="flex items-center justify-between mb-2">
-                <label className="text-sm font-medium text-gray-700">Slippage Tolerance</label>
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Slippage Tolerance</label>
                 <div className="flex space-x-2">
                   {['0.1', '0.5', '1.0'].map((value) => (
                     <button
                       key={value}
                       onClick={() => setSlippage(value)}
                       className={`px-3 py-1 rounded text-sm ${
-                        slippage === value ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100'
+                        slippage === value ? 'bg-blue-600 dark:bg-blue-500 text-white' : 'bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-500'
                       }`}
                     >
                       {value}%
@@ -225,7 +225,7 @@ const DexDemo = ({ onActionCompleted }: DexDemoProps) => {
                 value={slippage}
                 onChange={(e) => setSlippage(e.target.value)}
                 step="0.1"
-                className="w-full p-2 border border-gray-300 rounded text-sm"
+                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 placeholder="Custom slippage %"
               />
             </div>
@@ -233,14 +233,14 @@ const DexDemo = ({ onActionCompleted }: DexDemoProps) => {
 
           <div className="space-y-4">
             {/* From Token */}
-            <div className="border border-gray-200 rounded-lg p-4">
+            <div className="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
               <div className="flex items-center justify-between mb-2">
-                <label className="text-sm font-medium text-gray-700">From</label>
-                <span className="text-sm text-gray-500">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">From</label>
+                <span className="text-sm text-gray-500 dark:text-gray-400">
                   Balance: {tokenBalances[fromToken].balance.toFixed(4)} {fromToken}
                 </span>
               </div>
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2 sm:space-x-3">
                 <input
                   type="number"
                   value={fromAmount}
@@ -253,7 +253,7 @@ const DexDemo = ({ onActionCompleted }: DexDemoProps) => {
                   placeholder="0.0"
                   min="0"
                   step="0.000001"
-                  className="flex-1 text-2xl font-semibold bg-transparent outline-none"
+                  className="flex-1 text-lg sm:text-2xl font-semibold bg-transparent outline-none text-gray-900 dark:text-white min-w-0"
                 />
                 <TokenSelector
                   selectedToken={fromToken}
@@ -261,7 +261,7 @@ const DexDemo = ({ onActionCompleted }: DexDemoProps) => {
                   label="From"
                 />
               </div>
-              <div className="text-sm text-gray-500 mt-1">
+              <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                 ≈ ${fromAmount ? (parseFloat(fromAmount) * tokenBalances[fromToken].price).toFixed(2) : '0.00'}
               </div>
             </div>
@@ -270,27 +270,27 @@ const DexDemo = ({ onActionCompleted }: DexDemoProps) => {
             <div className="flex justify-center">
               <button
                 onClick={swapTokens}
-                className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors"
+                className="p-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full transition-colors"
               >
-                <ArrowRightLeft className="w-5 h-5 text-gray-600" />
+                <ArrowRightLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
               </button>
             </div>
 
             {/* To Token */}
-            <div className="border border-gray-200 rounded-lg p-4">
+            <div className="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
               <div className="flex items-center justify-between mb-2">
-                <label className="text-sm font-medium text-gray-700">To</label>
-                <span className="text-sm text-gray-500">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">To</label>
+                <span className="text-sm text-gray-500 dark:text-gray-400">
                   Balance: {tokenBalances[toToken].balance.toFixed(4)} {toToken}
                 </span>
               </div>
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2 sm:space-x-3">
                 <input
                   type="text"
                   value={toAmount}
                   readOnly
                   placeholder="0.0"
-                  className="flex-1 text-2xl font-semibold bg-transparent outline-none text-gray-700"
+                  className="flex-1 text-lg sm:text-2xl font-semibold bg-transparent outline-none text-gray-700 dark:text-gray-300 min-w-0"
                 />
                 <TokenSelector
                   selectedToken={toToken}
@@ -298,26 +298,26 @@ const DexDemo = ({ onActionCompleted }: DexDemoProps) => {
                   label="To"
                 />
               </div>
-              <div className="text-sm text-gray-500 mt-1">
+              <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                 ≈ ${toAmount ? (parseFloat(toAmount) * tokenBalances[toToken].price).toFixed(2) : '0.00'}
               </div>
             </div>
           </div>
 
           {fromAmount && toAmount && (
-            <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+            <div className="mt-6 p-4 bg-blue-50 dark:bg-gray-700 rounded-lg">
               <div className="flex items-center space-x-2 mb-2">
-                <Info className="w-4 h-4 text-blue-600" />
-                <span className="text-sm font-medium text-blue-900">Trade Details</span>
+                <Info className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                <span className="text-sm font-medium text-blue-900 dark:text-white">Trade Details</span>
               </div>
-              <div className="space-y-1 text-sm text-blue-800">
-                <div className="flex justify-between">
+              <div className="space-y-1 text-xs sm:text-sm text-blue-800 dark:text-gray-300">
+                <div className="flex justify-between items-start">
                   <span>Exchange Rate:</span>
-                  <span>1 {fromToken} = {((tokenBalances[fromToken].price / tokenBalances[toToken].price) * (1 - parseFloat(slippage) / 100)).toFixed(6)} {toToken}</span>
+                  <span className="text-right break-all">1 {fromToken} = {((tokenBalances[fromToken].price / tokenBalances[toToken].price) * (1 - parseFloat(slippage) / 100)).toFixed(6)} {toToken}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Price Impact:</span>
-                  <span className="text-green-600">{'<0.01%'}</span>
+                  <span className="text-green-600 dark:text-green-400">{'<0.01%'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Liquidity Provider Fee:</span>
@@ -330,7 +330,7 @@ const DexDemo = ({ onActionCompleted }: DexDemoProps) => {
           <button
             onClick={handleSwap}
             disabled={!fromAmount || !toAmount || parseFloat(fromAmount) > tokenBalances[fromToken].balance || parseFloat(fromAmount) <= 0}
-            className="w-full mt-6 bg-blue-600 text-white py-4 px-6 rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed font-semibold text-lg transition-colors"
+            className="w-full mt-6 bg-blue-600 dark:bg-blue-500 text-white py-4 px-6 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed font-semibold text-lg transition-colors"
           >
             {!fromAmount ? 'Enter Amount' : 
              parseFloat(fromAmount) <= 0 ? 'Enter Valid Amount' :

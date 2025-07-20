@@ -27,37 +27,37 @@ const HomePage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold text-center mb-2 text-gray-800">
+    <div className="min-h-screen">
+      <div className="container mx-auto px-4 py-6 sm:py-8">
+        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2 text-gray-800 dark:text-white">
           Blockchain Learning Hub
         </h1>
-        <p className="text-center text-gray-600 mb-8">
+        <p className="text-center text-gray-600 dark:text-gray-300 mb-6 sm:mb-8 text-sm sm:text-base max-w-3xl mx-auto">
           Interactive demonstrations to learn blockchain technology, cryptography, and decentralized finance
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-12">
         {apps.map((app) => (
           <Link
             key={app.path}
             to={app.path}
-            className="group block p-8 bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+            className="group block p-6 sm:p-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 border border-gray-200 dark:border-gray-700"
           >
-            <div className="flex items-center justify-center mb-6">
-              <div className={`p-4 rounded-full ${app.color} text-white shadow-lg`}>
-                <app.icon size={40} />
+            <div className="flex items-center justify-center mb-4 sm:mb-6">
+              <div className={`p-3 sm:p-4 rounded-full ${app.color} text-white shadow-lg`}>
+                <app.icon size={32} className="sm:w-10 sm:h-10" />
               </div>
             </div>
             
-            <h3 className="text-2xl font-semibold text-gray-900 mb-4 text-center">
+            <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4 text-center">
               {app.title}
             </h3>
             
-            <p className="text-gray-600 mb-6 text-center leading-relaxed">
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-4 sm:mb-6 text-center leading-relaxed">
               {app.description}
             </p>
             
-            <div className="flex items-center justify-center text-blue-600 group-hover:text-blue-800 transition-colors font-medium">
+            <div className="flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:text-blue-800 dark:group-hover:text-blue-300 transition-colors font-medium">
               <span className="mr-2">Learn More</span>
               <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </div>

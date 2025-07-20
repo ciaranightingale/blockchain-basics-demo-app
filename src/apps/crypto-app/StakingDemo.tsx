@@ -332,7 +332,7 @@ const StakingDemo = ({ onActionCompleted }: StakingDemoProps) => {
     const isStaked = userStake.amount > 0;
 
     return (
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow border dark:border-gray-700">
         <div className={`h-2 bg-gradient-to-r ${pool.color}`}></div>
         <div className="p-6">
           <div className="flex items-center justify-between mb-4">
@@ -341,12 +341,12 @@ const StakingDemo = ({ onActionCompleted }: StakingDemoProps) => {
                 {pool.token}
               </div>
               <div>
-                <h3 className="font-bold text-lg text-gray-900">{pool.name}</h3>
-                <p className="text-sm text-gray-600">{pool.description}</p>
+                <h3 className="font-bold text-lg text-gray-900 dark:text-white">{pool.name}</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300">{pool.description}</p>
               </div>
             </div>
             <div className={`px-3 py-1 rounded-full text-xs font-semibold ${
-              pool.riskLevel === 'Low' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+              pool.riskLevel === 'Low' ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-200' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-200'
             }`}>
               {pool.riskLevel} Risk
             </div>
@@ -354,37 +354,37 @@ const StakingDemo = ({ onActionCompleted }: StakingDemoProps) => {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">{pool.apy}%</div>
-              <div className="text-xs text-gray-500">APY</div>
+              <div className="text-2xl font-bold text-green-600 dark:text-green-400">{pool.apy}%</div>
+              <div className="text-xs text-gray-500 dark:text-gray-400">APY</div>
             </div>
             <div className="text-center">
-              <div className="text-lg font-semibold text-gray-900">{pool.tvl}</div>
-              <div className="text-xs text-gray-500">TVL</div>
+              <div className="text-lg font-semibold text-gray-900 dark:text-white">{pool.tvl}</div>
+              <div className="text-xs text-gray-500 dark:text-gray-400">TVL</div>
             </div>
             <div className="text-center">
-              <div className="text-lg font-semibold text-gray-900">{pool.minStake}</div>
-              <div className="text-xs text-gray-500">Min Stake</div>
+              <div className="text-lg font-semibold text-gray-900 dark:text-white">{pool.minStake}</div>
+              <div className="text-xs text-gray-500 dark:text-gray-400">Min Stake</div>
             </div>
             <div className="text-center">
-              <div className="text-lg font-semibold text-gray-900">{pool.lockPeriod}</div>
-              <div className="text-xs text-gray-500">Lock Period</div>
+              <div className="text-lg font-semibold text-gray-900 dark:text-white">{pool.lockPeriod}</div>
+              <div className="text-xs text-gray-500 dark:text-gray-400">Lock Period</div>
             </div>
           </div>
 
           {isStaked && (
-            <div className="bg-blue-50 rounded-lg p-4 mb-4">
+            <div className="bg-blue-50 dark:bg-gray-700 rounded-lg p-4 mb-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-blue-900">Your Stake</span>
-                <span className="text-sm text-blue-700">Staked for {formatTime(userStake.timeStaked)}</span>
+                <span className="text-sm font-medium text-blue-900 dark:text-white">Your Stake</span>
+                <span className="text-sm text-blue-700 dark:text-gray-300">Staked for {formatTime(userStake.timeStaked)}</span>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <div className="text-xl font-bold text-blue-900">{userStake.amount.toFixed(4)} {pool.token}</div>
-                  <div className="text-xs text-blue-700">Staked Amount</div>
+                  <div className="text-xl font-bold text-blue-900 dark:text-white">{userStake.amount.toFixed(4)} {pool.token}</div>
+                  <div className="text-xs text-blue-700 dark:text-gray-400">Staked Amount</div>
                 </div>
                 <div>
-                  <div className="text-xl font-bold text-green-600">{userStake.rewards.toFixed(6)} {pool.token}</div>
-                  <div className="text-xs text-blue-700">Pending Rewards</div>
+                  <div className="text-xl font-bold text-green-600 dark:text-green-400">{userStake.rewards.toFixed(6)} {pool.token}</div>
+                  <div className="text-xs text-blue-700 dark:text-gray-400">Pending Rewards</div>
                 </div>
               </div>
               <button
@@ -446,31 +446,31 @@ const StakingDemo = ({ onActionCompleted }: StakingDemoProps) => {
       <div className="max-w-7xl mx-auto">
         {/* Portfolio Overview */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-lg p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border dark:border-gray-700">
             <div className="flex items-center space-x-3 mb-4">
               <PiggyBank className="w-8 h-8 text-blue-600" />
-              <h3 className="font-bold text-lg text-gray-900">Total Staked</h3>
+              <h3 className="font-bold text-lg text-gray-900 dark:text-white">Total Staked</h3>
             </div>
-            <div className="text-3xl font-bold text-gray-900">${totalStakedValue.toLocaleString()}</div>
-            <div className="text-sm text-gray-500 mt-1">Across all pools</div>
+            <div className="text-3xl font-bold text-gray-900 dark:text-white">${totalStakedValue.toLocaleString()}</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">Across all pools</div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-lg p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border dark:border-gray-700">
             <div className="flex items-center space-x-3 mb-4">
               <Award className="w-8 h-8 text-green-600" />
-              <h3 className="font-bold text-lg text-gray-900">Total Rewards</h3>
+              <h3 className="font-bold text-lg text-gray-900 dark:text-white">Total Rewards</h3>
             </div>
             <div className="text-3xl font-bold text-green-600">${(totalRewards * 2500).toFixed(2)}</div>
-            <div className="text-sm text-gray-500 mt-1">Available to claim</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">Available to claim</div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-lg p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border dark:border-gray-700">
             <div className="flex items-center space-x-3 mb-4">
               <TrendingUp className="w-8 h-8 text-purple-600" />
-              <h3 className="font-bold text-lg text-gray-900">Avg APY</h3>
+              <h3 className="font-bold text-lg text-gray-900 dark:text-white">Avg APY</h3>
             </div>
             <div className="text-3xl font-bold text-purple-600">9.2%</div>
-            <div className="text-sm text-gray-500 mt-1">Weighted average</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">Weighted average</div>
           </div>
         </div>
 
@@ -484,9 +484,9 @@ const StakingDemo = ({ onActionCompleted }: StakingDemoProps) => {
         {/* Stake Modal */}
         {showStakeModal && selectedPool && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-xl shadow-2xl max-w-md w-full">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-md w-full border dark:border-gray-700">
               <div className="p-6">
-                <h3 className="text-xl font-bold mb-4">Stake {selectedPool.token}</h3>
+                <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">Stake {selectedPool.token}</h3>
                 
                 <div className="mb-6">
                   <div className="flex items-center justify-between mb-2">

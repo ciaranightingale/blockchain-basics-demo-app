@@ -122,18 +122,18 @@ const CryptoDemoApp = () => {
   const CurrentDemoComponent = demos[currentDemo].component;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold text-center mb-2 text-gray-800">
+    <div className="min-h-screen pb-32">
+      <div className="container mx-auto px-4 py-6 sm:py-8">
+        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2 text-gray-800 dark:text-white">
           Crypto Demo
         </h1>
-        <p className="text-center text-gray-600 mb-8">
+        <p className="text-center text-gray-600 dark:text-gray-300 mb-6 sm:mb-8 text-sm sm:text-base">
           Interactive demonstrations of crypto wallets, DEX trading, and DeFi staking
         </p>
         
         {/* Central Tab Navigation */}
-        <div className="flex justify-center mb-8">
-          <nav className="flex flex-wrap justify-center space-x-1 bg-white rounded-lg p-1 shadow-md">
+        <div className="flex justify-center mb-6 sm:mb-8">
+          <nav className="inline-flex flex-wrap justify-center gap-1 bg-white dark:bg-gray-800 rounded-lg p-1 shadow-md border dark:border-gray-700">
             {demos.map((demo, index) => (
               <button
                 key={demo.id}
@@ -141,7 +141,7 @@ const CryptoDemoApp = () => {
                 className={`px-4 py-3 rounded-md font-medium transition-all text-sm ${
                   currentDemo === index
                     ? 'bg-blue-500 text-white shadow-md'
-                    : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
                 }`}
               >
                 {demo.title}

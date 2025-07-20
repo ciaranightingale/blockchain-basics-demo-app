@@ -578,18 +578,18 @@ const EthereumPoSDemo = () => {
   ];
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
+    <div className="min-h-screen">
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold text-center mb-2 text-gray-800">
+        <h1 className="text-4xl font-bold text-center mb-2 text-gray-800 dark:text-white">
           Ethereum Proof of Stake Demo
         </h1>
-        <p className="text-center text-gray-600 mb-8">
+        <p className="text-center text-gray-600 dark:text-slate-300 mb-8">
           Interactive demonstration of Ethereum's PoS consensus mechanism
         </p>
         
         {/* Navigation Tabs */}
         <div className="flex justify-center mb-8">
-          <nav className="flex flex-wrap justify-center space-x-1 bg-white rounded-lg p-1 shadow-md">
+          <nav className="flex flex-wrap justify-center space-x-1 bg-white dark:bg-slate-800 rounded-lg p-1 shadow-md border border-gray-200 dark:border-slate-700">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
@@ -597,7 +597,7 @@ const EthereumPoSDemo = () => {
                 className={`px-4 py-3 rounded-md font-medium transition-all text-sm ${
                   currentTab === tab.id
                     ? 'bg-blue-500 text-white shadow-md'
-                    : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
+                    : 'text-gray-600 dark:text-slate-300 hover:text-gray-800 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-slate-700'
                 }`}
               >
                 {tab.label}

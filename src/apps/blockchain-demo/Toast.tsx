@@ -44,10 +44,10 @@ const Toast = ({ toast, onClose }: ToastProps) => {
 
   return (
     <div className={`mb-2 p-3 rounded-lg border-l-4 shadow-md transform transition-all duration-300 ease-in-out ${
-      toast.type === 'success' ? 'bg-green-50 border-green-500 text-green-800' :
-      toast.type === 'error' ? 'bg-red-50 border-red-500 text-red-800' :
-      toast.type === 'warning' ? 'bg-yellow-50 border-yellow-500 text-yellow-800' :
-      'bg-blue-50 border-blue-500 text-blue-800'
+      toast.type === 'success' ? 'bg-green-50 dark:bg-green-900 border-green-500 text-green-800 dark:text-green-200' :
+      toast.type === 'error' ? 'bg-red-50 dark:bg-red-900 border-red-500 text-red-800 dark:text-red-200' :
+      toast.type === 'warning' ? 'bg-yellow-50 dark:bg-yellow-900 border-yellow-500 text-yellow-800 dark:text-yellow-200' :
+      'bg-blue-50 dark:bg-blue-900 border-blue-500 text-blue-800 dark:text-blue-200'
     }`}>
       <div className="flex items-start justify-between">
         <div className="flex items-start space-x-3">

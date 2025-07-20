@@ -11,7 +11,7 @@ const CompletionModal = ({ isOpen, onClose }: CompletionModalProps) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl shadow-2xl max-w-md w-full transform animate-in zoom-in-95 duration-300">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-md w-full transform animate-in zoom-in-95 duration-300 border dark:border-gray-700">
         <div className="p-8 text-center">
           {/* Celebration Header */}
           <div className="relative mb-6">
@@ -26,18 +26,18 @@ const CompletionModal = ({ isOpen, onClose }: CompletionModalProps) => {
             </div>
           </div>
 
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
             🎉 Congratulations! 🎉
           </h2>
           
-          <p className="text-lg text-gray-600 mb-6">
+          <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">
             You've successfully completed the entire DeFi Demo Suite!
           </p>
 
           {/* Completion Checklist */}
-          <div className="bg-green-50 rounded-lg p-4 mb-6">
-            <h3 className="font-semibold text-green-900 mb-3">What you accomplished:</h3>
-            <div className="space-y-2 text-sm text-green-800">
+          <div className="bg-green-50 dark:bg-green-900 rounded-lg p-4 mb-6">
+            <h3 className="font-semibold text-green-900 dark:text-green-200 mb-3">What you accomplished:</h3>
+            <div className="space-y-2 text-sm text-green-800 dark:text-green-300">
               <div className="flex items-center space-x-2">
                 <CheckCircle className="w-4 h-4 text-green-600" />
                 <span>Sent a crypto transaction between wallets</span>
@@ -53,8 +53,8 @@ const CompletionModal = ({ isOpen, onClose }: CompletionModalProps) => {
             </div>
           </div>
 
-          <div className="bg-blue-50 rounded-lg p-4 mb-6">
-            <p className="text-sm text-blue-800">
+          <div className="bg-blue-50 dark:bg-blue-900 rounded-lg p-4 mb-6">
+            <p className="text-sm text-blue-800 dark:text-blue-200">
               <strong>🚀 You're now ready for real DeFi!</strong><br />
               You've experienced the core interactions that power decentralized finance.
             </p>
