@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { ArrowLeft, AlertCircle, Lock, X, CheckCircle, DollarSign, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -105,7 +105,6 @@ const BlockchainBasicsApp: React.FC = () => {
 
   const completedChallenges = challengeStates.filter(c => c.completed).length;
   const totalChallenges = challengeStates.length;
-  const progressPercentage = (completedChallenges / totalChallenges) * 100;
   const currentChallenge = challengeStates[currentChallengeIndex];
 
   const handleNextChallenge = () => {
