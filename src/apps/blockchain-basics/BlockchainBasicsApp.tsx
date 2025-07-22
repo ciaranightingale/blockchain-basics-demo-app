@@ -134,9 +134,9 @@ const challenges: Challenge[] = [
       location: "Political Opposition",
       type: "charity"
     },
-    amount: "$50,000",
+    amount: "$50",
     failureReason: "FBI Investigation",
-    failureMessage: "Transaction blocked: The government has blocked your $50,000 donation to an opposition political party. The FBI showed up at your door asking questions about your political activities and affiliations. Your donation has been flagged as suspicious activity. Learn more about threats to civil liberties: https://www.npr.org/2024/10/21/nx-s1-5134924/trump-election-2024-kamala-harris-elizabeth-cheney-threat-civil-liberties and mysterious deaths of political opponents: https://www.rferl.org/a/enemies-kremlin-deaths-prigozhin-list/32562583.html",
+    failureMessage: "Transaction blocked: The government has blocked your $50 donation to an opposition political party. The FBI showed up at your door asking questions about your political activities and affiliations. Your donation has been flagged as suspicious activity. Learn more about threats to civil liberties: https://www.npr.org/2024/10/21/nx-s1-5134924/trump-election-2024-kamala-harris-elizabeth-cheney-threat-civil-liberties and mysterious deaths of political opponents: https://www.rferl.org/a/enemies-kremlin-deaths-prigozhin-list/32562583.html",
     completed: false
   }
 ];
