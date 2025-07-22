@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { keccak256, toUtf8Bytes } from 'ethers';
-import StakingSlashing from './StakingSlashing';
 import Hash from './Hash';
+import BlockHashingTab from './BlockHashingTab';
 import BlockchainTab from './BlockchainTab';
 import DecentralizedTab from './DecentralizedTab';
 import BlockSigningTab from './BlockSigningTab';
@@ -101,13 +101,6 @@ const EthereumPoSDemo = () => {
     { id: 'alice', address: '0x1a2b3c...', name: 'Alice', stake: 32.0, isActive: true, isMalicious: false, slashingRisk: 0, rewards: 0, uptime: 100 },
     { id: 'bob', address: '0x4d5e6f...', name: 'Bob', stake: 32.0, isActive: true, isMalicious: false, slashingRisk: 0, rewards: 0, uptime: 100 },
     { id: 'charlie', address: '0x7g8h9i...', name: 'Charlie', stake: 32.0, isActive: true, isMalicious: false, slashingRisk: 0, rewards: 0, uptime: 100 },
-    { id: 'diana', address: '0xj1k2l3...', name: 'Diana', stake: 32.0, isActive: true, isMalicious: false, slashingRisk: 0, rewards: 0, uptime: 100 },
-    { id: 'eve', address: '0xm4n5o6...', name: 'Eve', stake: 32.0, isActive: true, isMalicious: false, slashingRisk: 0, rewards: 0, uptime: 100 },
-    { id: 'frank', address: '0xf7g8h9...', name: 'Frank', stake: 32.0, isActive: true, isMalicious: false, slashingRisk: 0, rewards: 0, uptime: 100 },
-    { id: 'grace', address: '0xi1j2k3...', name: 'Grace', stake: 32.0, isActive: true, isMalicious: false, slashingRisk: 0, rewards: 0, uptime: 100 },
-    { id: 'henry', address: '0xl4m5n6...', name: 'Henry', stake: 32.0, isActive: true, isMalicious: false, slashingRisk: 0, rewards: 0, uptime: 100 },
-    { id: 'ivy', address: '0xo7p8q9...', name: 'Ivy', stake: 32.0, isActive: false, isMalicious: false, slashingRisk: 1.8, rewards: 0, uptime: 95 },
-    { id: 'jack', address: '0xr1s2t3...', name: 'Jack', stake: 32.0, isActive: true, isMalicious: false, slashingRisk: 0, rewards: 0, uptime: 100 },
   ]);
 
   // Initialize blockchain state with properly calculated hashes
@@ -571,10 +564,10 @@ const EthereumPoSDemo = () => {
 
   const tabs = [
     { id: 'hash', label: 'Hash' },
+    { id: 'block-hashing', label: 'Block Hashing' },
     { id: 'block-signing', label: 'Block Signing' },
     { id: 'blockchain', label: 'PoS Blockchain' },
-    { id: 'decentralized', label: 'Decentralized' },
-    { id: 'staking', label: 'Validators' }
+    { id: 'validators', label: 'Validators' }
   ];
   
   return (
@@ -614,6 +607,12 @@ const EthereumPoSDemo = () => {
           setHashData={setHashData} 
         />
 
+        {/* Block Hashing Tab */}
+        <BlockHashingTab
+          currentTab={currentTab}
+          calculateHash={calculateHash}
+        />
+
         {/* Block Signing Tab */}
         <BlockSigningTab
           currentTab={currentTab}
@@ -629,10 +628,11 @@ const EthereumPoSDemo = () => {
           handleValidateBlock={handleValidateBlock}
         />
 
-        {/* Decentralized Consensus Tab */}
+        {/* Validators Tab */}
         <DecentralizedTab
           currentTab={currentTab}
           validators={validators}
+          setValidators={setValidators}
           pendingProposal={pendingProposal}
           handleProposeBlockDecentralized={handleProposeBlockDecentralized}
           handleVoteBlock={handleVoteBlock}
@@ -644,12 +644,6 @@ const EthereumPoSDemo = () => {
           selectedTransactions={selectedTransactions}
           handleTxSelection={handleTxSelection}
           blockchain={blockchain}
-        />
-        
-        <StakingSlashing 
-          currentTab={currentTab} 
-          validators={validators} 
-          setValidators={setValidators}
         />
       </div>
     </div>

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useToast } from './Toast.jsx';
 
 interface BlockSigningTabProps {
   currentTab: string;
@@ -10,7 +9,6 @@ function BlockSigningTab({
   currentTab, 
   calculateHash
 }: BlockSigningTabProps) {
-  const { showSuccess, showWarning } = useToast();
   
   // Block state
   const [blockData, setBlockData] = useState({
@@ -23,14 +21,16 @@ function BlockSigningTab({
   const [currentHash, setCurrentHash] = useState<string>('');
   const [signature, setSignature] = useState<any>(null);
   const [isValid, setIsValid] = useState<boolean>(true);
+  const [isHashExplicitlyCalculated, setIsHashExplicitlyCalculated] = useState<boolean>(false);
 
-  // Calculate hash whenever block data changes
+  // Calculate hash automatically whenever block data changes
   useEffect(() => {
     const calculateCurrentHash = async () => {
       if (calculateHash) {
-        const input = `${blockData.blockNumber}${blockData.data}${blockData.validator}`;
+        const input = `${blockData.blockNumber}${blockData.data}${blockData.validator}${blockData.timestamp}`;
         const hash = await calculateHash(input);
         setCurrentHash(hash);
+        setIsHashExplicitlyCalculated(true);
         
         // Check if signature is still valid
         if (signature) {
@@ -40,12 +40,13 @@ function BlockSigningTab({
     };
     
     calculateCurrentHash();
-  }, [blockData, calculateHash, signature]);
+  }, [blockData.blockNumber, blockData.data, blockData.validator, blockData.timestamp, calculateHash, signature]);
+
 
   const handleSignBlock = async () => {
     if (!calculateHash) return;
     
-    const input = `${blockData.blockNumber}${blockData.data}${blockData.validator}`;
+    const input = `${blockData.blockNumber}${blockData.data}${blockData.validator}${blockData.timestamp}`;
     const hash = await calculateHash(input);
     
     const newSignature = {
@@ -60,20 +61,13 @@ function BlockSigningTab({
     setSignature(newSignature);
     setIsValid(true);
     
-    showSuccess(
-      `Block ${blockData.blockNumber} signed successfully!\n\nHash: ${hash.substring(0, 24)}...\nSigned by: ${blockData.validator.split('(')[0]}`,
-      'Block Signed'
-    );
   };
 
   const handleDataChange = (newData: string) => {
     setBlockData(prev => ({ ...prev, data: newData }));
     
-    if (signature) {
-      showWarning(
-        'Block data changed! The signature is now invalid.\n\nClick "Sign Block" to create a new valid signature.',
-        'Signature Invalid'
-      );
+    if (isHashExplicitlyCalculated) {
+      setIsHashExplicitlyCalculated(false);
     }
   };
 
@@ -92,57 +86,69 @@ function BlockSigningTab({
               ? 'border-green-400 dark:border-green-500' 
               : 'border-red-400 dark:border-red-500'
           }`}>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Block Info */}
-              <div>
-                <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">Block Information</h3>
-                
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Block Number:
-                    </label>
-                    <input
-                      type="number"
-                      value={blockData.blockNumber}
-                      onChange={(e) => setBlockData(prev => ({ ...prev, blockNumber: parseInt(e.target.value) || 1 }))}
-                      className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Validator:
-                    </label>
-                    <input
-                      type="text"
-                      value={blockData.validator}
-                      onChange={(e) => setBlockData(prev => ({ ...prev, validator: e.target.value }))}
-                      className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    />
-                  </div>
+            {/* Block Info */}
+            <div className="mb-6">
+              <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">Block Information</h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Block Number:
+                  </label>
+                  <input
+                    type="number"
+                    value={blockData.blockNumber}
+                    onChange={(e) => setBlockData(prev => ({ ...prev, blockNumber: parseInt(e.target.value) || 1 }))}
+                    className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
                 </div>
-              </div>
-
-              {/* Transaction Data */}
-              <div>
-                <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">Transaction Data</h3>
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Transactions (try editing!):
+                    Validator:
                   </label>
-                  <textarea
-                    value={blockData.data}
-                    onChange={(e) => handleDataChange(e.target.value)}
-                    className={`w-full h-32 p-3 border rounded-md text-sm font-mono resize-none transition-colors bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${
-                      isValid 
-                        ? 'border-gray-300 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-400 focus:border-blue-500' 
-                        : 'border-red-300 dark:border-red-500 bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-300'
-                    }`}
-                    placeholder="Enter transaction data..."
+                  <input
+                    type="text"
+                    value={blockData.validator}
+                    onChange={(e) => setBlockData(prev => ({ ...prev, validator: e.target.value }))}
+                    className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Timestamp:
+                  </label>
+                  <input
+                    type="number"
+                    value={blockData.timestamp}
+                    onChange={(e) => setBlockData(prev => ({ ...prev, timestamp: parseInt(e.target.value) || Date.now() }))}
+                    className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{new Date(blockData.timestamp).toLocaleString()}</p>
+                </div>
+                
+              </div>
+            </div>
+
+            {/* Transaction Data */}
+            <div className="mb-6">
+              <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">Transaction Data</h3>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Transactions (try editing!):
+                </label>
+                <textarea
+                  value={blockData.data}
+                  onChange={(e) => handleDataChange(e.target.value)}
+                  className={`w-full h-32 p-3 border rounded-md text-sm font-mono resize-none transition-colors bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${
+                    isValid 
+                      ? 'border-gray-300 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-400 focus:border-blue-500' 
+                      : 'border-red-300 dark:border-red-500 bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-300'
+                  }`}
+                  placeholder="Enter transaction data..."
+                />
               </div>
             </div>
 
@@ -156,6 +162,9 @@ function BlockSigningTab({
               }`}>
                 {currentHash || 'Calculating...'}
               </div>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                Hash updates automatically as you edit block data
+              </p>
             </div>
 
             {/* Signature Section */}
@@ -220,7 +229,7 @@ function BlockSigningTab({
                 </div>
               ) : (
                 <div className="p-4 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-center text-gray-600 dark:text-gray-300">
-                  <p>No signature yet. Click "Sign Block" to create a cryptographic signature.</p>
+                  <p>No signature yet. Click "Hash & Sign Block" to create a cryptographic signature.</p>
                 </div>
               )}
             </div>
@@ -230,7 +239,7 @@ function BlockSigningTab({
           <div className="mt-8 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-6">
             <h4 className="font-semibold text-blue-900 dark:text-blue-300 mb-2">How Block Signing Works:</h4>
             <div className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
-              <p>• <strong>Hash Calculation</strong>: Block hash is calculated from block number, transaction data, and validator</p>
+              <p>• <strong>Hash Calculation</strong>: Block hash is calculated from all block components (number, previous hash, data, validator, timestamp)</p>
               <p>• <strong>Signing Process</strong>: The validator cryptographically signs the calculated hash</p>
               <p>• <strong>Verification</strong>: Any change to block data changes the hash, invalidating the signature</p>
               <p>• <strong>Security</strong>: This prevents tampering - any modification is immediately detectable</p>
