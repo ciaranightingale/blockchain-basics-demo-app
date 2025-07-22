@@ -25,7 +25,7 @@ const HomePage = () => {
       color: 'bg-purple-500',
     },
     {
-      title: 'Blockchain Basics',
+      title: 'Why Blockchain',
       description: 'Experience real-world problems with traditional finance that blockchain solves.',
       path: '/blockchain-basics',
       icon: AlertCircle,
@@ -43,7 +43,7 @@ const HomePage = () => {
           Interactive demonstrations to learn blockchain technology, cryptography, and decentralized finance
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8 lg:gap-12">
         {apps.map((app) => (
           <Link
             key={app.path}

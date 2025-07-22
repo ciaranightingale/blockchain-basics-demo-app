@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Blocks, Coins, Key, Menu, X } from 'lucide-react';
+import { Home, Blocks, Coins, Key, Menu, X, AlertCircle } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 import { useTheme } from '../contexts/ThemeContext';
 import { useState } from 'react';
@@ -14,6 +14,7 @@ const Navigation = () => {
     { path: '/blockchain', label: 'Blockchain Demo', icon: Blocks },
     { path: '/crypto', label: 'Crypto Demo', icon: Coins },
     { path: '/ecdsa', label: 'ECDSA Signatures', icon: Key },
+    { path: '/blockchain-basics', label: 'Why Blockchain', icon: AlertCircle },
   ];
 
   return (
