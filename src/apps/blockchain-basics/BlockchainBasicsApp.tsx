@@ -25,7 +25,7 @@ const challenges: Challenge[] = [
     description: "Your friend Maria urgently needs $50 for medical expenses.",
     scenario: "Maria has no fixed address, so she can't open a bank account. Try to send her money quickly.",
     recipient: {
-      name: "Maria Santos",
+      name: "Maria",
       location: "No Fixed Address",
       type: "person"
     },
@@ -51,11 +51,26 @@ const challenges: Challenge[] = [
   },
   {
     id: 3,
+    title: "Buy Oranges During Hyperinflation",
+    description: "Purchase oranges from a local market, but prices are changing rapidly due to hyperinflation.",
+    scenario: "You want to buy oranges that cost Z$10 when you looked at the prices that morning, you take your Z$100 cash to the market after your day of work. Try to buy some oranges",
+    recipient: {
+      name: "Fresh Fruit Market",
+      location: "Harare, Zimbabwe",
+      type: "business"
+    },
+    amount: "Z$100",
+    failureReason: "Hyperinflation",
+    failureMessage: "Payment rejected: Price has increased to Z$200 while you were at work. Currency instability makes real-time pricing impossible. Your savings have lost 50% of their value in the past day. This actually happened in the real-world: learn more about Zimbabwe's hyperinflation: https://en.wikipedia.org/wiki/Hyperinflation_in_Zimbabwe",
+    completed: false
+  },
+  {
+    id: 4,
     title: "Pay Freelancer Instantly",
     description: "Your developer in Ukraine completed urgent work and needs immediate payment.",
     scenario: "It's Friday evening and your freelancer needs payment to cover weekend expenses, but banks are closed.",
     recipient: {
-      name: "Alex Petrov",
+      name: "Bob",
       location: "Kyiv, Ukraine",
       type: "person"
     },
@@ -65,7 +80,7 @@ const challenges: Challenge[] = [
     completed: false
   },
   {
-    id: 4,
+    id: 5,
     title: "Trustless Escrow Agreement",
     description: "Buy a rare collectible from a stranger online without using a middleman service.",
     scenario: "You found a vintage guitar worth $2,000 from a seller across the country, but neither of you trusts the other to send money/item first.",
@@ -80,7 +95,7 @@ const challenges: Challenge[] = [
     completed: false
   },
   {
-    id: 5,
+    id: 6,
     title: "Automated Insurance Claim",
     description: "File a flight delay insurance claim that should pay out automatically when your flight is delayed.",
     scenario: "Your flight is delayed 4+ hours, clearly triggering your insurance policy payout. However, the insurance company finds ways to deny your valid claim.",
@@ -93,10 +108,40 @@ const challenges: Challenge[] = [
     failureReason: "Claim Denied",
     failureMessage: "Claim denied: After review, the airline classified this as 'extraordinary circumstances' due to air traffic control issues. Additionally, our updated terms of service (effective last month) now exclude delays on Fridays during peak travel season. No payout will be issued.",
     completed: false
+  },
+  {
+    id: 7,
+    title: "Withdraw Cash in Nigeria",
+    description: "You need to withdraw cash for daily expenses, but strict government limits restrict your access to your own money.",
+    scenario: "You need N50,000 (about $120) for rent and groceries this week, withdraw your money to pay your rent!",
+    recipient: {
+      name: "Local ATM/Bank",
+      location: "Lagos, Nigeria",
+      type: "business"
+    },
+    amount: "N50,000",
+    failureReason: "Government Cash Withdrawal Limits",
+    failureMessage: "Transaction blocked: Weekly cash withdrawal limit of N20,000 ($45) exceeded. Your account is frozen from further cash withdrawals until next week. Learn more about Nigeria's cash withdrawal policy: https://www.ubagroup.com/nigeria/cbn-cash-withdrawal-policy/",
+    completed: false
+  },
+  {
+    id: 8,
+    title: "Donate to Opposition Political Party",
+    description: "Support the Pink Party's campaign for democratic reforms and civil liberties protection.",
+    scenario: "You believe strongly in the Pink Party's platform of protecting voting rights and civil liberties. You want to make a major donation of $50,000 to support their campaign before the election.",
+    recipient: {
+      name: "The Pink Party Campaign",
+      location: "Political Opposition",
+      type: "charity"
+    },
+    amount: "$50,000",
+    failureReason: "FBI Investigation",
+    failureMessage: "Transaction blocked: The government has blocked your $50,000 donation to an opposition political party. The FBI showed up at your door asking questions about your political activities and affiliations. Your donation has been flagged as suspicious activity. Learn more about threats to civil liberties: https://www.npr.org/2024/10/21/nx-s1-5134924/trump-election-2024-kamala-harris-elizabeth-cheney-threat-civil-liberties and mysterious deaths of political opponents: https://www.rferl.org/a/enemies-kremlin-deaths-prigozhin-list/32562583.html",
+    completed: false
   }
 ];
 
-const BlockchainBasicsApp: React.FC = () => {
+const WhyBlockchainApp: React.FC = () => {
   const [currentChallengeIndex, setCurrentChallengeIndex] = useState<number>(0);
   const [challengeStates, setChallengeStates] = useState<Challenge[]>(challenges);
   const [showFailureModal, setShowFailureModal] = useState(false);
@@ -153,6 +198,47 @@ const BlockchainBasicsApp: React.FC = () => {
     return colors[index % colors.length];
   };
 
+  const renderMessageWithLinks = (message: string) => {
+    // Simple approach: replace specific patterns with links
+    let result = message;
+    
+    // Handle "Learn more about threats to civil liberties: URL"
+    result = result.replace(
+      /(Learn more about threats to civil liberties): (https?:\/\/[^\s]+)/g,
+      (match, linkText, url) => `LINK1:${linkText}|${url}`
+    );
+    
+    // Handle "mysterious deaths of political opponents: URL"
+    result = result.replace(
+      /(mysterious deaths of political opponents): (https?:\/\/[^\s]+)/g,
+      (match, linkText, url) => `LINK2:${linkText}|${url}`
+    );
+    
+    // Split and render
+    const parts = result.split(/(LINK[12]:[^|]+\|[^\s]+)/g);
+    
+    return parts.map((part, index) => {
+      const linkMatch = part.match(/LINK[12]:([^|]+)\|(.+)/);
+      if (linkMatch) {
+        const linkText = linkMatch[1];
+        const url = linkMatch[2];
+        
+        return (
+          <a
+            key={index}
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 dark:text-blue-400 hover:underline"
+          >
+            {linkText}
+          </a>
+        );
+      }
+      return part;
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
@@ -176,7 +262,7 @@ const BlockchainBasicsApp: React.FC = () => {
         {/* Title and Introduction */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            Blockchain Basics: Why We Need Decentralization
+            Why Blockchain
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
             Experience the real-world problems with traditional financial systems. 
@@ -203,9 +289,7 @@ const BlockchainBasicsApp: React.FC = () => {
         {/* Current Challenge */}
         <div className="max-w-2xl mx-auto">
           <div 
-            className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden ${
-              currentChallenge.completed ? 'opacity-75' : ''
-            }`}
+            className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden"
           >
             {/* Challenge Header */}
             <div className={`${getColorForChallenge(currentChallengeIndex)} p-4 text-white`}>
@@ -304,11 +388,11 @@ const BlockchainBasicsApp: React.FC = () => {
 
                 <button
                   onClick={handleNextChallenge}
-                  disabled={currentChallengeIndex === challengeStates.length - 1}
+                  disabled={currentChallengeIndex === challengeStates.length - 1 || !currentChallenge.completed}
                   className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all ${
-                    currentChallengeIndex === challengeStates.length - 1
+                    currentChallengeIndex === challengeStates.length - 1 || !currentChallenge.completed
                       ? 'bg-gray-200 text-gray-400 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                      : 'bg-blue-600 hover:bg-blue-700 text-white'
                   }`}
                 >
                   <span>Next</span>
@@ -364,7 +448,7 @@ const BlockchainBasicsApp: React.FC = () => {
                 </span>
               </div>
               <p className="text-gray-600 dark:text-gray-300 text-sm">
-                {selectedChallenge.failureMessage}
+                {renderMessageWithLinks(selectedChallenge.failureMessage)}
               </p>
             </div>
 
@@ -374,8 +458,16 @@ const BlockchainBasicsApp: React.FC = () => {
                   selectedChallenge.id <= 3 
                     ? "This transaction would be completed in minutes, 24/7, without geographic restrictions or intermediary approval."
                     : selectedChallenge.id === 4
+                    ? "This payment would be completed instantly, outside banking hours, enabling global freelancer payments 24/7."
+                    : selectedChallenge.id === 5
                     ? "Smart contracts enable trustless escrow - funds are automatically released when both parties fulfill conditions, with no fees or delays."
-                    : "Smart contracts automatically execute payouts when conditions are met (flight delay data from oracles), eliminating manual reviews and reducing claim denial rates to near zero."
+                    : selectedChallenge.id === 6
+                    ? "Smart contracts automatically execute payouts when conditions are met (flight delay data from oracles), eliminating manual reviews and reducing claim denial rates to near zero."
+                    : selectedChallenge.id === 7
+                    ? "You control your own money without government withdrawal limits or banking restrictions. Your funds, your choice."
+                    : selectedChallenge.id === 8
+                    ? "Anonymous donations protect political donors from government surveillance and retaliation. Democracy thrives with financial privacy."
+                    : "Blockchain enables financial freedom without intermediary control or government restrictions."
                 }
               </p>
             </div>
@@ -393,4 +485,4 @@ const BlockchainBasicsApp: React.FC = () => {
   );
 };
 
-export default BlockchainBasicsApp;
+export default WhyBlockchainApp;
