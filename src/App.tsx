@@ -4,6 +4,7 @@ import HomePage from './components/HomePage';
 import BlockchainApp from './apps/blockchain-demo/BlockchainApp';
 import CryptoApp from './apps/crypto-app/CryptoApp';
 import EcdsaApp from './apps/ecdsa-demo/EcdsaApp';
+import BlockchainBasicsApp from './apps/blockchain-basics/BlockchainBasicsApp';
 import Footer from './components/Footer';
 import { ThemeProvider } from './contexts/ThemeContext';
 
@@ -29,6 +30,11 @@ function AppContent() {
           title: "ECDSA Signature Demo",
           description: "Educational tool for understanding elliptic curve digital signatures"
         };
+      case '/blockchain-basics':
+        return {
+          title: "Blockchain Basics Challenges",
+          description: "Experience real-world problems with traditional finance that blockchain solves"
+        };
       default:
         return {
           title: "Blockchain Basics Demo",
@@ -46,6 +52,7 @@ function AppContent() {
           <Route path="/blockchain" element={<BlockchainApp />} />
           <Route path="/crypto" element={<CryptoApp />} />
           <Route path="/ecdsa" element={<EcdsaApp />} />
+          <Route path="/blockchain-basics" element={<BlockchainBasicsApp />} />
         </Routes>
       </main>
       {location.pathname !== '/crypto' && <Footer {...getFooterProps()} />}
