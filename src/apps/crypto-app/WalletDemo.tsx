@@ -1,9 +1,11 @@
 // src/demos/WalletDemo.jsx
 import { useState } from 'react';
-import { Wallet, Send, Eye, EyeOff, Copy, Check } from 'lucide-react';
+import { Wallet, Send, Eye, EyeOff, Copy, Check, Plus } from 'lucide-react';
 import { useToast } from './Toast';
 
 interface WalletState {
+  id: string;
+  name: string;
   address: string;
   balance: number;
   privateKey: string;
@@ -27,42 +29,70 @@ interface WalletDemoProps {
 }
 
 const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
-  // Wallet states
-  const [walletA, setWalletA] = useState<WalletState>({
-    address: '0x742d35Cc7B4C4532C...a3eC73ac',
-    balance: 2.5,
-    privateKey: '0x8da4ef21b864d2cc526dbdb2a120bd2874c36c9d0a1fb7f8c63d7f7a8b41de8f',
-    showPrivateKey: false
-  });
+  // Generate random ethereum address and private key
+  const generateWallet = (name: string): WalletState => {
+    const randomHex = () => Math.floor(Math.random() * 16).toString(16);
+    const address = '0x' + Array.from({ length: 40 }, randomHex).join('');
+    const privateKey = '0x' + Array.from({ length: 64 }, randomHex).join('');
+    
+    return {
+      id: Math.random().toString(36).substr(2, 9),
+      name,
+      address,
+      balance: Math.random() * 3 + 0.5, // Random balance between 0.5 and 3.5 ETH
+      privateKey,
+      showPrivateKey: false
+    };
+  };
 
-  const [walletB, setWalletB] = useState<WalletState>({
-    address: '0x8ba1f109551bD432E...c6BcF04b',
-    balance: 1.8,
-    privateKey: '0x4c0883a69102937d6231471b5dbb6204fe5129617082792ae468d01a3f362318',
-    showPrivateKey: false
-  });
+  // Initialize with 2 wallets
+  const [wallets, setWallets] = useState<WalletState[]>([
+    {
+      id: 'wallet-1',
+      name: 'Main Wallet',
+      address: '0x742d35Cc7B4C4532CaCd8beCcBE3e5e4A78B14da3eC73ac',
+      balance: 2.5,
+      privateKey: '0x8da4ef21b864d2cc526dbdb2a120bd2874c36c9d0a1fb7f8c63d7f7a8b41de8f',
+      showPrivateKey: false
+    },
+    {
+      id: 'wallet-2', 
+      name: 'Secondary Wallet',
+      address: '0x8ba1f109551bD432E27b2F90CE97F2608c6BcF04b',
+      balance: 1.8,
+      privateKey: '0x4c0883a69102937d6231471b5dbb6204fe5129617082792ae468d01a3f362318',
+      showPrivateKey: false
+    }
+  ]);
 
   // Transaction states
   const [sendAmount, setSendAmount] = useState<string>('');
-  const [recipient, setRecipient] = useState<string>('');
+  const [recipientWalletId, setRecipientWalletId] = useState<string>('');
   const [gasPrice, setGasPrice] = useState<string>('20');
   const [gasLimit, setGasLimit] = useState<string>('21000');
-  const [activeWallet, setActiveWallet] = useState<'A' | 'B'>('A');
+  const [activeWalletId, setActiveWalletId] = useState<string>('wallet-1');
   const [showTransactionModal, setShowTransactionModal] = useState<boolean>(false);
   const [transactionData, setTransactionData] = useState<TransactionData | null>(null);
   const [copied, setCopied] = useState<string>('');
 
   const { showToast, ToastComponent } = useToast();
 
-  const currentWallet = activeWallet === 'A' ? walletA : walletB;
-  const targetWallet = activeWallet === 'A' ? walletB : walletA;
+  const currentWallet = wallets.find(w => w.id === activeWalletId) || wallets[0];
+  const availableRecipients = wallets.filter(w => w.id !== activeWalletId);
 
-  const togglePrivateKey = (wallet: 'A' | 'B') => {
-    if (wallet === 'A') {
-      setWalletA(prev => ({ ...prev, showPrivateKey: !prev.showPrivateKey }));
-    } else {
-      setWalletB(prev => ({ ...prev, showPrivateKey: !prev.showPrivateKey }));
-    }
+  const createNewWallet = () => {
+    const walletNumber = wallets.length + 1;
+    const newWallet = generateWallet(`Wallet ${walletNumber}`);
+    setWallets(prev => [...prev, newWallet]);
+    showToast(`Created ${newWallet.name}!`, 'success', 'New Wallet Created 🎉');
+  };
+
+  const togglePrivateKey = (walletId: string) => {
+    setWallets(prev => prev.map(wallet => 
+      wallet.id === walletId 
+        ? { ...wallet, showPrivateKey: !wallet.showPrivateKey }
+        : wallet
+    ));
   };
 
   const copyToClipboard = async (text: string, type: string) => {
@@ -77,12 +107,17 @@ const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
 
   const prepareTransaction = () => {
     if (!sendAmount || parseFloat(sendAmount) <= 0) {
-      alert('Please enter a valid amount');
+      showToast('Please enter a valid amount', 'error');
+      return;
+    }
+
+    if (!recipientWalletId) {
+      showToast('Please select a recipient wallet', 'error');
       return;
     }
 
     if (parseFloat(sendAmount) > currentWallet.balance) {
-      alert('Insufficient balance');
+      showToast('Insufficient balance', 'error');
       return;
     }
 
@@ -90,15 +125,19 @@ const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
     const total = parseFloat(sendAmount) + fee;
 
     if (total > currentWallet.balance) {
-      alert('Insufficient balance for transaction + gas fees');
+      showToast('Insufficient balance for transaction + gas fees', 'error');
       return;
     }
 
-    const toAddress = recipient || targetWallet.address;
+    const recipientWallet = wallets.find(w => w.id === recipientWalletId);
+    if (!recipientWallet) {
+      showToast('Recipient wallet not found', 'error');
+      return;
+    }
     
     const txData = {
       from: currentWallet.address,
-      to: toAddress,
+      to: recipientWallet.address,
       value: sendAmount,
       gasPrice: gasPrice,
       gasLimit: gasLimit,
@@ -114,20 +153,29 @@ const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
   const signAndSendTransaction = () => {
     const amount = parseFloat(sendAmount);
     const fee = calculateTransactionFee();
-    const targetWalletName = activeWallet === 'A' ? 'B' : 'A';
     
-    if (activeWallet === 'A') {
-      setWalletA(prev => ({ ...prev, balance: prev.balance - amount - fee }));
-      setWalletB(prev => ({ ...prev, balance: prev.balance + amount }));
-    } else {
-      setWalletB(prev => ({ ...prev, balance: prev.balance - amount - fee }));
-      setWalletA(prev => ({ ...prev, balance: prev.balance + amount }));
+    const recipientWallet = wallets.find(w => w.id === recipientWalletId);
+    if (!recipientWallet) {
+      showToast('Recipient wallet not found', 'error');
+      return;
     }
+
+    // Update wallet balances
+    setWallets(prev => prev.map(wallet => {
+      if (wallet.id === activeWalletId) {
+        // Deduct from sender
+        return { ...wallet, balance: wallet.balance - amount - fee };
+      } else if (wallet.id === recipientWalletId) {
+        // Add to recipient
+        return { ...wallet, balance: wallet.balance + amount };
+      }
+      return wallet;
+    }));
 
     setShowTransactionModal(false);
     setTransactionData(null);
     setSendAmount('');
-    setRecipient('');
+    setRecipientWalletId('');
     
     // Mark wallet completion
     if (onActionCompleted) {
@@ -135,23 +183,23 @@ const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
     }
     
     showToast(
-      `Successfully sent ${amount} ETH to Wallet ${targetWalletName}`,
+      `Successfully sent ${amount} ETH to ${recipientWallet.name}`,
       'success',
       'Transaction Completed! 💸'
     );
   };
 
-  const WalletCard = ({ wallet, walletName, isActive }: { wallet: WalletState; walletName: 'A' | 'B'; isActive: boolean }) => (
+  const WalletCard = ({ wallet, isActive }: { wallet: WalletState; isActive: boolean }) => (
     <div className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border-2 transition-all ${
       isActive ? 'border-blue-500 shadow-xl' : 'border-gray-200 dark:border-gray-700'
     }`}>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-2">
           <Wallet className="w-6 h-6 text-blue-600" />
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-white">Wallet {walletName}</h3>
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-white">{wallet.name}</h3>
         </div>
         <button
-          onClick={() => setActiveWallet(walletName)}
+          onClick={() => setActiveWalletId(wallet.id)}
           className={`px-3 py-1 rounded-full text-sm font-medium ${
             isActive ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500'
           }`}
@@ -168,10 +216,10 @@ const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
               {wallet.address}
             </div>
             <button
-              onClick={() => copyToClipboard(wallet.address, `address-${walletName}`)}
+              onClick={() => copyToClipboard(wallet.address, `address-${wallet.id}`)}
               className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 flex-shrink-0"
             >
-              {copied === `address-${walletName}` ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+              {copied === `address-${wallet.id}` ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
             </button>
           </div>
         </div>
@@ -190,17 +238,17 @@ const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
               {wallet.showPrivateKey ? wallet.privateKey : '••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••'}
             </div>
             <button
-              onClick={() => togglePrivateKey(walletName)}
+              onClick={() => togglePrivateKey(wallet.id)}
               className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 flex-shrink-0"
             >
               {wallet.showPrivateKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
             {wallet.showPrivateKey && (
               <button
-                onClick={() => copyToClipboard(wallet.privateKey, `key-${walletName}`)}
+                onClick={() => copyToClipboard(wallet.privateKey, `key-${wallet.id}`)}
                 className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 flex-shrink-0"
               >
-                {copied === `key-${walletName}` ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                {copied === `key-${wallet.id}` ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
               </button>
             )}
           </div>
@@ -212,26 +260,32 @@ const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
   return (
     <div className="p-4 sm:p-6">
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-6 sm:mb-8">
-          <WalletCard 
-            wallet={walletA} 
-            walletName="A" 
-            isActive={activeWallet === 'A'} 
-          />
-          <WalletCard 
-            wallet={walletB} 
-            walletName="B" 
-            isActive={activeWallet === 'B'} 
-          />
+        {/* Wallets Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8 mb-6 sm:mb-8">
+          {wallets.map((wallet) => (
+            <WalletCard 
+              key={wallet.id}
+              wallet={wallet} 
+              isActive={wallet.id === activeWalletId} 
+            />
+          ))}
         </div>
 
-        <div className="text-center">
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
           <button
             onClick={() => setShowTransactionModal(true)}
             className="bg-blue-600 text-white py-3 px-8 rounded-lg hover:bg-blue-700 transition-colors font-medium inline-flex items-center space-x-2"
           >
             <Send className="w-5 h-5" />
             <span>Send Transaction</span>
+          </button>
+          <button
+            onClick={createNewWallet}
+            className="bg-green-600 text-white py-3 px-8 rounded-lg hover:bg-green-700 transition-colors font-medium inline-flex items-center space-x-2"
+          >
+            <Plus className="w-5 h-5" />
+            <span>Create New Wallet</span>
           </button>
         </div>
 
@@ -254,24 +308,33 @@ const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">From Wallet</label>
                     <div className="p-3 bg-blue-50 dark:bg-blue-900 rounded-lg border border-blue-200 dark:border-blue-700">
-                      <div className="font-medium text-blue-900 dark:text-blue-200">Wallet {activeWallet}</div>
+                      <div className="font-medium text-blue-900 dark:text-blue-200">{currentWallet.name}</div>
                       <div className="text-sm text-blue-700 dark:text-blue-300 font-mono">{currentWallet.address}</div>
                       <div className="text-sm text-blue-700 dark:text-blue-300">Balance: {currentWallet.balance.toFixed(4)} ETH</div>
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Recipient Address</label>
-                    <input
-                      type="text"
-                      value={recipient}
-                      onChange={(e) => setRecipient(e.target.value)}
-                      placeholder={targetWallet.address}
-                      className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    />
-                    <div className="mt-2 text-sm text-gray-500">
-                      Leave empty to send to Wallet {activeWallet === 'A' ? 'B' : 'A'}
-                    </div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Recipient Wallet</label>
+                    <select
+                      value={recipientWalletId}
+                      onChange={(e) => setRecipientWalletId(e.target.value)}
+                      className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    >
+                      <option value="">Select recipient wallet...</option>
+                      {availableRecipients.map((wallet) => (
+                        <option key={wallet.id} value={wallet.id}>
+                          {wallet.name} - {wallet.balance.toFixed(4)} ETH
+                        </option>
+                      ))}
+                    </select>
+                    {recipientWalletId && (
+                      <div className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                        <div className="font-mono text-xs">
+                          {wallets.find(w => w.id === recipientWalletId)?.address}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div>
@@ -310,7 +373,7 @@ const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
                   <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
                     <div className="flex justify-between items-center text-sm">
                       <span className="text-gray-600 dark:text-gray-300">Estimated Gas Fee:</span>
-                      <span className="font-medium">{calculateTransactionFee().toFixed(6)} ETH</span>
+                      <span className="font-medium text-gray-900 dark:text-white">{calculateTransactionFee().toFixed(6)} ETH</span>
                     </div>
                     <div className="flex justify-between items-center text-sm mt-1">
                       <span className="text-gray-600 dark:text-gray-300">Total (Amount + Fee):</span>
@@ -323,7 +386,7 @@ const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
                   <div className="flex space-x-3">
                     <button
                       onClick={() => setShowTransactionModal(false)}
-                      className="flex-1 bg-gray-200 text-gray-800 py-3 px-6 rounded-lg hover:bg-gray-300 transition-colors"
+                      className="flex-1 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 py-3 px-6 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
                     >
                       Cancel
                     </button>
@@ -352,15 +415,15 @@ const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
                       setShowTransactionModal(false);
                       setTransactionData(null);
                     }}
-                    className="text-gray-400 hover:text-gray-600 text-xl"
+                    className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 text-xl"
                   >
                     ✕
                   </button>
                 </div>
                 
                 <div className="space-y-4 mb-6">
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                    <div className="text-sm text-yellow-800">
+                  <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg p-4">
+                    <div className="text-sm text-yellow-800 dark:text-yellow-300">
                       <strong>⚠️ Review carefully:</strong> This transaction cannot be undone once signed.
                     </div>
                   </div>
@@ -368,21 +431,21 @@ const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
                   <div className="space-y-3">
                     <div className="flex justify-between">
                       <span className="text-gray-600 dark:text-gray-300">From:</span>
-                      <span className="font-mono text-sm">{transactionData?.from}</span>
+                      <span className="font-mono text-sm text-gray-900 dark:text-white">{transactionData?.from}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600 dark:text-gray-300">To:</span>
-                      <span className="font-mono text-sm">{transactionData?.to}</span>
+                      <span className="font-mono text-sm text-gray-900 dark:text-white">{transactionData?.to}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600 dark:text-gray-300">Amount:</span>
-                      <span className="font-bold">{transactionData?.value} ETH</span>
+                      <span className="font-bold text-gray-900 dark:text-white">{transactionData?.value} ETH</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600 dark:text-gray-300">Gas Fee:</span>
-                      <span>{transactionData?.fee} ETH</span>
+                      <span className="text-gray-900 dark:text-white">{transactionData?.fee} ETH</span>
                     </div>
-                    <div className="flex justify-between border-t pt-2">
+                    <div className="flex justify-between border-t dark:border-gray-600 pt-2">
                       <span className="text-gray-600 dark:text-gray-300 font-medium">Total:</span>
                       <span className="font-bold text-lg text-gray-900 dark:text-white">{transactionData?.total} ETH</span>
                     </div>
@@ -402,7 +465,7 @@ const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
                 <div className="flex space-x-3">
                   <button
                     onClick={() => setTransactionData(null)}
-                    className="flex-1 bg-gray-200 text-gray-800 py-3 px-6 rounded-lg hover:bg-gray-300 transition-colors"
+                    className="flex-1 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 py-3 px-6 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
                   >
                     Back
                   </button>

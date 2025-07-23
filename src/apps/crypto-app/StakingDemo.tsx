@@ -163,7 +163,7 @@ const StakingDemo = ({ onActionCompleted }: StakingDemoProps) => {
 
     // Prepare transaction data
     const txData = {
-      from: '0x742d35Cc7B4C4532C...a3eC73ac',
+      from: '0x742d35Cc7B4C4532CaCd8beCcBE3e5e4A78B14da3eC73ac',
       to: `${selectedPool.name} Contract`,
       action: `Stake ${amount} ${selectedPool.token}`,
       amount: `${amount} ${selectedPool.token}`,
@@ -196,7 +196,7 @@ const StakingDemo = ({ onActionCompleted }: StakingDemoProps) => {
 
     // Prepare transaction data
     const txData = {
-      from: '0x742d35Cc7B4C4532C...a3eC73ac',
+      from: '0x742d35Cc7B4C4532CaCd8beCcBE3e5e4A78B14da3eC73ac',
       to: `${selectedPool.name} Contract`,
       action: `Unstake ${amount} ${selectedPool.token}`,
       amount: `${amount} ${selectedPool.token}`,
@@ -224,7 +224,7 @@ const StakingDemo = ({ onActionCompleted }: StakingDemoProps) => {
     
     // Prepare transaction data
     const txData = {
-      from: '0x742d35Cc7B4C4532C...a3eC73ac',
+      from: '0x742d35Cc7B4C4532CaCd8beCcBE3e5e4A78B14da3eC73ac',
       to: `${pool.name} Contract`,
       action: `Claim ${rewards.toFixed(6)} ${pool.token} rewards`,
       amount: `${rewards.toFixed(6)} ${pool.token}`,

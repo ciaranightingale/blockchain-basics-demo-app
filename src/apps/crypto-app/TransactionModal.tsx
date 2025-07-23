@@ -24,21 +24,21 @@ const TransactionModal = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto border dark:border-gray-700">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold">{title}</h3>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white">{title}</h3>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 text-xl"
+              className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 text-xl"
             >
               ✕
             </button>
           </div>
           
           <div className="space-y-4 mb-6">
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-              <div className="text-sm text-yellow-800">
+            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg p-4">
+              <div className="text-sm text-yellow-800 dark:text-yellow-300">
                 <strong>⚠️ Review carefully:</strong> This transaction cannot be undone once signed.
               </div>
             </div>
@@ -47,55 +47,55 @@ const TransactionModal = ({
             <div className="space-y-3">
               {transactionData.from && (
                 <div className="flex justify-between">
-                  <span className="text-gray-600">From:</span>
-                  <span className="font-mono text-sm">{transactionData.from}</span>
+                  <span className="text-gray-600 dark:text-gray-400">From:</span>
+                  <span className="font-mono text-sm text-gray-900 dark:text-white">{transactionData.from}</span>
                 </div>
               )}
               {transactionData.to && (
                 <div className="flex justify-between">
-                  <span className="text-gray-600">To:</span>
-                  <span className="font-mono text-sm">{transactionData.to}</span>
+                  <span className="text-gray-600 dark:text-gray-400">To:</span>
+                  <span className="font-mono text-sm text-gray-900 dark:text-white">{transactionData.to}</span>
                 </div>
               )}
               {transactionData.amount && (
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Amount:</span>
-                  <span className="font-bold">{transactionData.amount}</span>
+                  <span className="text-gray-600 dark:text-gray-400">Amount:</span>
+                  <span className="font-bold text-gray-900 dark:text-white">{transactionData.amount}</span>
                 </div>
               )}
               {transactionData.action && (
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Action:</span>
-                  <span className="font-bold">{transactionData.action}</span>
+                  <span className="text-gray-600 dark:text-gray-400">Action:</span>
+                  <span className="font-bold text-gray-900 dark:text-white">{transactionData.action}</span>
                 </div>
               )}
               {transactionData.price && (
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Price:</span>
-                  <span className="font-bold">{transactionData.price}</span>
+                  <span className="text-gray-600 dark:text-gray-400">Price:</span>
+                  <span className="font-bold text-gray-900 dark:text-white">{transactionData.price}</span>
                 </div>
               )}
               {transactionData.fee && (
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Network Fee:</span>
-                  <span>{transactionData.fee}</span>
+                  <span className="text-gray-600 dark:text-gray-400">Network Fee:</span>
+                  <span className="text-gray-900 dark:text-white">{transactionData.fee}</span>
                 </div>
               )}
               {transactionData.total && (
-                <div className="flex justify-between border-t pt-2">
-                  <span className="text-gray-600 font-medium">Total:</span>
-                  <span className="font-bold text-lg">{transactionData.total}</span>
+                <div className="flex justify-between border-t dark:border-gray-600 pt-2">
+                  <span className="text-gray-600 dark:text-gray-400 font-medium">Total:</span>
+                  <span className="font-bold text-lg text-gray-900 dark:text-white">{transactionData.total}</span>
                 </div>
               )}
             </div>
 
             {/* Additional Details */}
             {transactionData.details && (
-              <div className="bg-gray-50 rounded-lg p-4">
-                <h4 className="font-medium mb-2">Transaction Details:</h4>
-                <div className="text-xs font-mono bg-white p-2 rounded border space-y-1">
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                <h4 className="font-medium mb-2 text-gray-900 dark:text-white">Transaction Details:</h4>
+                <div className="text-xs font-mono bg-white dark:bg-gray-800 p-2 rounded border dark:border-gray-600 space-y-1">
                   {transactionData.details.map((detail: string, index: number) => (
-                    <div key={index}>{detail}</div>
+                    <div key={index} className="text-gray-900 dark:text-white">{detail}</div>
                   ))}
                 </div>
               </div>
@@ -103,7 +103,7 @@ const TransactionModal = ({
 
             {/* Custom content */}
             {transactionData.customContent && (
-              <div className="bg-blue-50 rounded-lg p-4">
+              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
                 {transactionData.customContent}
               </div>
             )}
@@ -113,7 +113,7 @@ const TransactionModal = ({
             <button
               onClick={onClose}
               disabled={isProcessing}
-              className="flex-1 bg-gray-200 text-gray-800 py-3 px-6 rounded-lg hover:bg-gray-300 disabled:opacity-50 transition-colors"
+              className="flex-1 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 py-3 px-6 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 disabled:opacity-50 transition-colors"
             >
               Cancel
             </button>
