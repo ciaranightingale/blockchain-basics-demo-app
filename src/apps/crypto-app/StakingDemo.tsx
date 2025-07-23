@@ -109,7 +109,7 @@ const StakingDemo = ({ onActionCompleted }: StakingDemoProps) => {
     {
       id: 'UNI-STAKE',
       token: 'UNI',
-      name: 'Uniswap Liquidity Mining',
+      name: 'Uniswap Staking',
       apy: 15.3,
       tvl: '$420M',
       minStake: 10,

@@ -5,7 +5,7 @@ const HomePage = () => {
   const apps = [
     {
       title: 'Blockchain Demo',
-      description: 'Learn about blockchain fundamentals, consensus mechanisms, and mining.',
+      description: 'Learn about blockchain fundamentals, consensus mechanisms, and .',
       path: '/blockchain',
       icon: Blocks,
       color: 'bg-blue-500',

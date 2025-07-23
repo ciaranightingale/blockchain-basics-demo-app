@@ -128,7 +128,7 @@ const challenges: Challenge[] = [
     id: 8,
     title: "Donate to Opposition Political Party",
     description: "Support the Pink Party's campaign for democratic reforms and civil liberties protection.",
-    scenario: "You believe strongly in the Pink Party's platform of protecting voting rights and civil liberties. You want to make a major donation of $50,000 to support their campaign before the election.",
+    scenario: "You believe strongly in the Pink Party's platform of protecting voting rights and civil liberties. You want to make a donation of $50 to support their campaign before the election.",
     recipient: {
       name: "The Pink Party Campaign",
       location: "Political Opposition",
