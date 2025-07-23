@@ -269,7 +269,7 @@ function DecentralizedTab({
 
                         {/* Validator */}
                         <div className="text-sm text-gray-700 dark:text-gray-300 mb-2">
-                          <strong>Validator:</strong> {block.validator.split('(')[0]}
+                          <strong>Proposer:</strong> {block.validator.split('(')[0]}
                         </div>
 
                         {/* Transactions */}
@@ -436,7 +436,12 @@ function DecentralizedTab({
                               disabled={pendingProposal || selectedTransactions.length === 0}
                               className="w-full px-3 py-2 font-medium rounded transition-colors bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white text-xs"
                             >
-                              {pendingProposal ? 'Proposing...' : 'Sign & Propose Block'}
+                              {pendingProposal 
+                                ? 'Proposing...' 
+                                : selectedTransactions.length === 0 
+                                ? 'Select Transactions' 
+                                : 'Sign & Propose Block'
+                              }
                             </button>
                             {selectedTransactions.length === 0}
                           </div>
