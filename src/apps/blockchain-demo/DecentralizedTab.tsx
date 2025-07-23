@@ -66,18 +66,17 @@ function DecentralizedTab({
         const hash = await calculateHash(input);
         setCurrentHash(hash);
         
-        // Reset signature when data changes
-        if (signature) {
-          setSignature(null);
-        }
-      } else {
+        // Reset signature when transaction data changes
+        setSignature(null);
+      } else if (!pendingProposal && selectedTransactions.length === 0) {
+        // Only clear hash if there's no pending proposal
         setCurrentHash('');
         setSignature(null);
       }
     };
     
     calculateBlockHash();
-  }, [selectedTransactions, selectedProposer, autoSelectedValidator, blockchain.length, calculateHash, pendingTransactions, signature]);
+  }, [selectedTransactions, selectedProposer, autoSelectedValidator, blockchain.length, calculateHash, pendingTransactions, pendingProposal]);
 
   const handleSignAndProposeBlock = async () => {
     if (!currentHash) return;
@@ -409,7 +408,7 @@ function DecentralizedTab({
                         </div>
                       </div>
                       {/* Hashes */}
-                      <div>
+                      <div className="space-y-2">
                         <div>
                           <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">Previous Hash:</label>
                           <div className="text-xs font-mono break-all p-1 rounded overflow-auto max-h-16 text-gray-600 bg-gray-100 dark:text-gray-300 dark:bg-gray-700">
@@ -424,7 +423,7 @@ function DecentralizedTab({
                         </div>
                         <div>
                           {signature && (
-                            <div className="mb-2">
+                            <div>
                               <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">Signature:</label>
                               <div className="text-xs font-mono break-all p-1 rounded overflow-auto max-h-16 text-orange-800 bg-orange-100 border border-orange-300 dark:text-orange-300 dark:bg-orange-900/20 dark:border-orange-500">
                                 Signed at {new Date(signature.timestamp).toLocaleTimeString()}
