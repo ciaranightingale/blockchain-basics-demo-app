@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useToast } from './Toast';
 
 interface DecentralizedTabProps {
@@ -16,6 +16,7 @@ interface DecentralizedTabProps {
   selectedTransactions: number[];
   handleTxSelection: (txId: number, isSelected: boolean) => void;
   blockchain: any[];
+  calculateHash: (input: string) => Promise<string>;
 }
 
 function DecentralizedTab({ 
@@ -32,13 +33,68 @@ function DecentralizedTab({
   pendingTransactions,
   selectedTransactions,
   handleTxSelection,
-  blockchain
+  blockchain,
+  calculateHash
 }: DecentralizedTabProps) {
   const { showSuccess, showError, showInfo, showWarning } = useToast();
   const [newValidatorName, setNewValidatorName] = useState('');
   const [newValidatorStake, setNewValidatorStake] = useState(32);
   const [selectedValidator, setSelectedValidator] = useState('');
   const [additionalStake, setAdditionalStake] = useState(32);
+  
+  // Block proposal hash and signature state
+  const [currentHash, setCurrentHash] = useState<string>('');
+  const [signature, setSignature] = useState<any>(null);
+
+  // Calculate hash automatically when selected transactions change
+  useEffect(() => {
+    const calculateBlockHash = async () => {
+      if (calculateHash && selectedTransactions.length > 0) {
+        const blockNumber = blockchain.length + 1;
+        const proposer = selectedProposer || autoSelectedValidator;
+        const transactionData = selectedTransactions
+          .map(txId => pendingTransactions.find(tx => tx.id === txId))
+          .filter(tx => tx)
+          .map(tx => `${tx.from}→${tx.to}: ${tx.amount}`)
+          .join('\n');
+        
+        const input = `${blockNumber}${transactionData}${proposer}`;
+        const hash = await calculateHash(input);
+        setCurrentHash(hash);
+        
+        // Reset signature when data changes
+        if (signature) {
+          setSignature(null);
+        }
+      } else {
+        setCurrentHash('');
+        setSignature(null);
+      }
+    };
+    
+    calculateBlockHash();
+  }, [selectedTransactions, selectedProposer, autoSelectedValidator, blockchain.length, calculateHash, pendingTransactions, signature]);
+
+  const handleSignAndProposeBlock = async () => {
+    if (!currentHash) return;
+    
+    const proposer = selectedProposer || autoSelectedValidator;
+    
+    // Create signature
+    const newSignature = {
+      hash: currentHash,
+      blockNumber: blockchain.length + 1,
+      proposer: proposer,
+      transactionCount: selectedTransactions.length,
+      timestamp: Date.now(),
+      signedAt: new Date().toISOString()
+    };
+    
+    setSignature(newSignature);
+    
+    // Call the original proposal handler
+    handleProposeBlockDecentralized();
+  };
 
   const handleAddValidator = () => {
     if (newValidatorName) {
@@ -148,215 +204,235 @@ function DecentralizedTab({
             <p className="text-gray-600 dark:text-gray-300">Manage validators and see how they participate in consensus. Stake up to 2048 ETH per validator.</p>
           </div>
 
-          {/* Block Proposal Section */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border-2 border-green-500 dark:border-green-400 mb-8">
-            <h3 className="text-xl font-bold mb-4 text-center text-green-700 dark:text-green-400">Propose New Block</h3>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-              {/* Validator Selection */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Validator:
-                </label>
-                <select
-                  value={selectedProposer}
-                  onChange={(e) => setSelectedProposer(e.target.value)}
-                  className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-green-500 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                >
-                  <option value="">Auto-select</option>
-                  {validators.filter(v => v.isActive).map((validator, index) => (
-                    <option key={index} value={`${validator.name} (${validator.address})`}>
-                      {validator.name} - {validator.stake} ETH
-                    </option>
-                  ))}
-                </select>
-                <div className="mt-1 p-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded text-xs text-gray-900 dark:text-green-300">
-                  <strong>Selected:</strong> {selectedProposer ? selectedProposer.split('(')[0] : autoSelectedValidator.split('(')[0]}
-                </div>
-              </div>
-
-              {/* Block Info */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Block Info:
-                </label>
-                <div className="space-y-2">
-                  <div className="p-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded text-sm text-gray-900 dark:text-white">
-                    <strong>Block #:</strong> {blockchain.length + 1}
-                  </div>
-                </div>
-              </div>
-
-              {/* Transaction Selection */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Transactions ({selectedTransactions.length} selected):
-                </label>
-                <div className="border border-gray-300 dark:border-gray-600 rounded-md p-2 max-h-32 overflow-y-auto bg-gray-50 dark:bg-gray-700">
-                  {pendingTransactions.map(tx => (
-                    <label key={tx.id} className="flex items-center space-x-2 p-1 hover:bg-white dark:hover:bg-gray-600 rounded cursor-pointer">
-                      <input 
-                        type="checkbox" 
-                        checked={selectedTransactions.includes(tx.id)}
-                        onChange={(e) => handleTxSelection(tx.id, e.target.checked)}
-                        className="h-3 w-3 text-green-600"
-                      />
-                      <div className="flex-1 text-xs text-gray-900 dark:text-white">
-                        <div className="font-semibold">{tx.amount}</div>
-                        <div className="font-mono text-gray-600 dark:text-gray-400 text-xs">{tx.from.substring(0, 8)}→{tx.to.substring(0, 8)}</div>
-                      </div>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Propose Button */}
-              <div className="flex flex-col justify-center">
-                <button
-                  onClick={handleProposeBlockDecentralized}
-                  disabled={pendingProposal || selectedTransactions.length === 0}
-                  className="w-full bg-green-500 hover:bg-green-600 disabled:bg-green-300 text-white font-bold py-4 px-4 rounded-lg transition-colors"
-                >
-                  {pendingProposal ? (
-                    <span className="flex items-center justify-center">
-                      Proposing...
-                    </span>
-                  ) : (
-                    <span className="flex flex-col items-center">
-                      <span>Propose Block</span>
-                    </span>
-                  )}
-                </button>
-                {selectedTransactions.length === 0 && (
-                  <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-2">
-                    Select transactions first
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-
           {/* PoS Blockchain Section */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border-2 border-blue-500 dark:border-blue-400 mb-8">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-bold text-blue-700 dark:text-blue-400">PoS Blockchain</h3>
               <div className="text-sm text-gray-600 dark:text-gray-300">
-                {blockchain.length} blocks • Scroll right to see latest →
+                {blockchain.length} blocks • Pending block on right →
               </div>
             </div>
             
             {/* Horizontal Scrollable Blockchain */}
-            <div className="overflow-x-auto pb-4">
-              {blockchain.length > 0 ? (
-                <div className="flex space-x-4 min-w-max">
-                  {blockchain.map((block, index) => (
-                    <div key={index} className="flex items-center">
-                      {/* Block */}
-                      <div 
-                        className={`w-80 h-[28rem] flex-shrink-0 border-2 rounded-lg p-4 transition-colors relative ${
-                          block.isMalicious
-                            ? 'border-red-600 bg-red-100 dark:bg-red-900/20 dark:border-red-500 shadow-red-200 shadow-lg'
-                            : block.isValid === false
-                            ? 'border-red-400 bg-red-50 dark:bg-red-900/10 dark:border-red-400' 
-                            : block.isValid === true
-                            ? 'border-green-400 bg-green-50 dark:bg-green-900/10 dark:border-green-400' 
-                            : 'border-yellow-400 bg-yellow-50 dark:bg-yellow-900/10 dark:border-yellow-400'
-                        }`}
-                      >
-                        <div className="h-full flex flex-col">
-                          {/* Block Header */}
-                          <div className="flex items-center justify-between mb-2">
-                            <div className="flex items-center space-x-2">
-                              <span className="font-bold text-lg text-gray-900 dark:text-white">Block {block.block}</span>
-                              {block.isMalicious && (
-                                <span className="text-xs bg-red-600 text-white px-2 py-1 rounded-full font-bold">
-                                  MALICIOUS
-                                </span>
-                              )}
-                            </div>
-                            <div className="flex flex-col items-end space-y-1">
-                              <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                                block.isValid === false
-                                  ? 'bg-red-200 text-red-800 dark:bg-red-800 dark:text-red-200'
-                                  : block.isValid === true
-                                  ? 'bg-green-200 text-green-800 dark:bg-green-800 dark:text-green-200' 
-                                  : 'bg-yellow-200 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-200'
-                              }`}>
-                                {block.isValid === false ? 'Invalid' : block.isValid === true ? 'Valid' : 'Unsigned'}
+            <div className="overflow-x-auto pb-4" 
+                 ref={(el) => {
+                   if (el) {
+                     el.scrollLeft = el.scrollWidth;
+                   }
+                 }}>
+              <div className="flex space-x-4 min-w-max">
+                {blockchain.map((block, index) => (
+                  <div key={index} className="flex items-center">
+                    {/* Block */}
+                    <div 
+                      className={`w-80 h-[28rem] flex-shrink-0 border-2 rounded-lg p-4 transition-colors relative ${
+                        block.isMalicious
+                          ? 'border-red-600 bg-red-100 dark:bg-red-900/20 dark:border-red-500 shadow-red-200 shadow-lg'
+                          : block.isValid === false
+                          ? 'border-red-400 bg-red-50 dark:bg-red-900/10 dark:border-red-400' 
+                          : block.isValid === true
+                          ? 'border-green-400 bg-green-50 dark:bg-green-900/10 dark:border-green-400' 
+                          : 'border-yellow-400 bg-yellow-50 dark:bg-yellow-900/10 dark:border-yellow-400'
+                      }`}
+                    >
+                      <div className="h-full flex flex-col">
+                        {/* Block Header */}
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center space-x-2">
+                            <span className="font-bold text-lg text-gray-900 dark:text-white">Block {block.block}</span>
+                            {block.isMalicious && (
+                              <span className="text-xs bg-red-600 text-white px-2 py-1 rounded-full font-bold">
+                                MALICIOUS
                               </span>
-                              {block.finalized && (
-                                <span className="text-xs bg-blue-200 text-blue-800 dark:bg-blue-800 dark:text-blue-200 px-2 py-1 rounded-full">
-                                  {block.attestations}% consensus
-                                </span>
-                              )}
-                            </div>
+                            )}
                           </div>
-
-                          {/* Validator */}
-                          <div className="text-sm text-gray-700 dark:text-gray-300 mb-2">
-                            <strong>Validator:</strong> {block.validator.split('(')[0]}
-                          </div>
-
-                          {/* Transactions */}
-                          <div className="mb-2 flex-1">
-                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                              Transactions:
-                            </label>
-                            <div className={`w-full h-20 p-2 border rounded text-xs font-mono overflow-y-auto ${
+                          <div className="flex flex-col items-end space-y-1">
+                            <span className={`text-xs px-2 py-1 rounded-full font-medium ${
                               block.isValid === false
-                                ? 'border-red-300 bg-red-50 text-red-800 dark:border-red-500 dark:bg-red-900/20 dark:text-red-300' 
-                                : block.isValid === 'unsigned'
-                                ? 'border-yellow-300 bg-yellow-50 text-yellow-800 dark:border-yellow-500 dark:bg-yellow-900/20 dark:text-yellow-300'
-                                : 'border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white'
+                                ? 'bg-red-200 text-red-800 dark:bg-red-800 dark:text-red-200'
+                                : block.isValid === true
+                                ? 'bg-green-200 text-green-800 dark:bg-green-800 dark:text-green-200' 
+                                : 'bg-yellow-200 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-200'
                             }`}>
-                              {block.data || 'No transactions'}
+                              {block.isValid === false ? 'Invalid' : block.isValid === true ? 'Valid' : 'Unsigned'}
+                            </span>
+                            {block.finalized && (
+                              <span className="text-xs bg-blue-200 text-blue-800 dark:bg-blue-800 dark:text-blue-200 px-2 py-1 rounded-full">
+                                {block.attestations}% consensus
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Validator */}
+                        <div className="text-sm text-gray-700 dark:text-gray-300 mb-2">
+                          <strong>Validator:</strong> {block.validator.split('(')[0]}
+                        </div>
+
+                        {/* Transactions */}
+                        <div className="mb-2 flex-1">
+                          <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Transactions:
+                          </label>
+                          <div className={`w-full h-20 p-2 border rounded text-xs font-mono overflow-y-auto ${
+                            block.isValid === false
+                              ? 'border-red-300 bg-red-50 text-red-800 dark:border-red-500 dark:bg-red-900/20 dark:text-red-300' 
+                              : block.isValid === 'unsigned'
+                              ? 'border-yellow-300 bg-yellow-50 text-yellow-800 dark:border-yellow-500 dark:bg-yellow-900/20 dark:text-yellow-300'
+                              : 'border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white'
+                          }`}>
+                            {block.data || 'No transactions'}
+                          </div>
+                        </div>
+
+                        {/* Hashes */}
+                        <div className="space-y-2 mt-auto">
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">Previous Hash:</label>
+                            <div className={`text-xs font-mono break-all p-1 rounded overflow-auto max-h-16 ${
+                              block.isValid === false && index > 0
+                                ? 'text-red-800 bg-red-100 border border-red-300 dark:text-red-300 dark:bg-red-900/20 dark:border-red-500'
+                                : block.isValid === 'unsigned' && index > 0
+                                ? 'text-yellow-800 bg-yellow-100 border border-yellow-300 dark:text-yellow-300 dark:bg-yellow-900/20 dark:border-yellow-500'
+                                : 'text-gray-600 bg-gray-100 dark:text-gray-300 dark:bg-gray-700'
+                            }`}>
+                              {block.prevHash}
                             </div>
                           </div>
-
-                          {/* Hashes */}
-                          <div className="space-y-2 mt-auto">
-                            <div>
-                              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">Previous Hash:</label>
-                              <div className={`text-xs font-mono break-all p-1 rounded overflow-auto max-h-16 ${
-                                block.isValid === false && index > 0
-                                  ? 'text-red-800 bg-red-100 border border-red-300 dark:text-red-300 dark:bg-red-900/20 dark:border-red-500'
-                                  : block.isValid === 'unsigned' && index > 0
-                                  ? 'text-yellow-800 bg-yellow-100 border border-yellow-300 dark:text-yellow-300 dark:bg-yellow-900/20 dark:border-yellow-500'
-                                  : 'text-gray-600 bg-gray-100 dark:text-gray-300 dark:bg-gray-700'
-                              }`}>
-                                {block.prevHash}
-                              </div>
-                            </div>
-                            <div>
-                              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">Block Hash:</label>
-                              <div className={`text-xs font-mono break-all p-1 rounded overflow-auto max-h-16 ${
-                                block.isValid === false
-                                  ? 'text-red-800 bg-red-100 border border-red-300 dark:text-red-300 dark:bg-red-900/20 dark:border-red-500' 
-                                  : block.isValid === 'unsigned'
-                                  ? 'text-yellow-800 bg-yellow-100 border border-yellow-300 dark:text-yellow-300 dark:bg-yellow-900/20 dark:border-yellow-500'
-                                  : 'text-gray-800 bg-blue-100 dark:text-blue-200 dark:bg-blue-900/20'
-                              }`}>
-                                {block.hash}
-                              </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">Block Hash:</label>
+                            <div className={`text-xs font-mono break-all p-1 rounded overflow-auto max-h-16 ${
+                              block.isValid === false
+                                ? 'text-red-800 bg-red-100 border border-red-300 dark:text-red-300 dark:bg-red-900/20 dark:border-red-500' 
+                                : block.isValid === 'unsigned'
+                                ? 'text-yellow-800 bg-yellow-100 border border-yellow-300 dark:text-yellow-300 dark:bg-yellow-900/20 dark:border-yellow-500'
+                                : 'text-gray-800 bg-blue-100 dark:text-blue-200 dark:bg-blue-900/20'
+                            }`}>
+                              {block.hash}
                             </div>
                           </div>
                         </div>
                       </div>
-                      
-                      {/* Arrow between blocks */}
-                      {index < blockchain.length - 1 && (
-                        <div className="flex-shrink-0 px-2">
-                          <div className="text-gray-400 dark:text-gray-600">→</div>
-                        </div>
-                      )}
                     </div>
-                  ))}
+                    
+                    {/* Arrow between blocks */}
+                    <div className="flex-shrink-0 px-2">
+                      <div className="text-gray-400 dark:text-gray-600">→</div>
+                    </div>
+                  </div>
+                ))}
+
+                {/* Pending Block - Always Present */}
+                <div className="flex items-center">
+                  <div className="w-80 h-[28rem] flex-shrink-0 border-2 rounded-lg p-4 border-orange-400 bg-orange-50 dark:bg-orange-900/20 dark:border-orange-500">
+                    <div className="h-full flex flex-col">
+                      {/* Block Header */}
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center space-x-2">
+                          <span className="font-bold text-lg text-gray-900 dark:text-white">Block {blockchain.length + 1}</span>
+                        </div>
+                        <div className="flex flex-col items-end space-y-1">
+                          <span className="text-xs px-2 py-1 rounded-full font-medium bg-orange-200 text-orange-800 dark:bg-orange-800 dark:text-orange-200">
+                            Pending
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Proposer Selection */}
+                      <div className="mb-2">
+                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Proposer:</label>
+                        <select
+                          value={selectedProposer}
+                          onChange={(e) => setSelectedProposer(e.target.value)}
+                          className="w-full p-1 border border-orange-300 dark:border-orange-500 rounded text-xs bg-orange-50 dark:bg-orange-900/20 text-gray-900 dark:text-white"
+                        >
+                          <option value="">Auto-select</option>
+                          {validators.filter(v => v.isActive).map((validator, index) => (
+                            <option key={index} value={`${validator.name} (${validator.address})`}>
+                              {validator.name} - {validator.stake} ETH
+                            </option>
+                          ))}
+                        </select>
+                        <div className="text-xs text-orange-700 dark:text-orange-300 mt-1">
+                          Selected: {selectedProposer ? selectedProposer.split('(')[0] : autoSelectedValidator.split('(')[0]}
+                        </div>
+                      </div>
+
+                      {/* Transaction Selection */}
+                      <div className="mb-2 flex-1">
+                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Transactions:
+                        </label>
+                        <div className="w-full h-20 p-2 border border-orange-300 bg-orange-50 dark:border-orange-500 dark:bg-orange-900/20 rounded text-xs overflow-y-auto">
+                          {pendingTransactions.map(tx => (
+                            <label key={tx.id} className="flex items-center space-x-2 p-1 hover:bg-orange-100 dark:hover:bg-orange-800/20 rounded cursor-pointer">
+                              <input 
+                                type="checkbox" 
+                                checked={selectedTransactions.includes(tx.id)}
+                                onChange={(e) => handleTxSelection(tx.id, e.target.checked)}
+                                className="h-3 w-3 text-orange-600"
+                              />
+                              <div className="flex-1 text-xs text-orange-800 dark:text-orange-300">
+                                <div className="font-semibold">{tx.amount}</div>
+                                <div className="text-orange-600 dark:text-orange-400">{tx.from.substring(0, 8)}→{tx.to.substring(0, 8)}</div>
+                              </div>
+                            </label>
+                          ))}
+                          {pendingTransactions.length === 0 && (
+                            <div className="text-xs text-orange-600 dark:text-orange-400 text-center py-2">
+                              No pending transactions
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Hashes */}
+                      <div className="space-y-2 mt-auto">
+                        <div>
+                          <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">Previous Hash:</label>
+                          <div className="text-xs font-mono break-all p-1 rounded overflow-auto max-h-16 text-gray-600 bg-gray-100 dark:text-gray-300 dark:bg-gray-700">
+                            {blockchain.length > 0 ? blockchain[blockchain.length - 1].hash : '0x0000...'}
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">Block Hash:</label>
+                          <div className="text-xs font-mono break-all p-1 rounded overflow-auto max-h-16 text-orange-800 bg-orange-100 border border-orange-300 dark:text-orange-300 dark:bg-orange-900/20 dark:border-orange-500">
+                            {currentHash || 'Select transactions to calculate...'}
+                          </div>
+                        </div>
+                        {signature && (
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">Signature:</label>
+                            <div className="text-xs font-mono break-all p-1 rounded overflow-auto max-h-16 text-orange-800 bg-orange-100 border border-orange-300 dark:text-orange-300 dark:bg-orange-900/20 dark:border-orange-500">
+                              Signed at {new Date(signature.timestamp).toLocaleTimeString()}
+                            </div>
+                          </div>
+                        )}
+                        <div className="mt-4 pt-4 border-t border-orange-300 dark:border-orange-500">
+                          <button
+                            onClick={handleSignAndProposeBlock}
+                            disabled={pendingProposal || selectedTransactions.length === 0}
+                            className="w-full px-3 py-2 font-medium rounded transition-colors bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white text-xs"
+                          >
+                            {pendingProposal ? 'Proposing...' : 'Sign & Propose Block'}
+                          </button>
+                          {selectedTransactions.length === 0 && (
+                            <p className="text-xs text-orange-600 dark:text-orange-400 text-center mt-2">
+                              Select transactions above
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              ) : (
-                <div className="text-center text-gray-500 dark:text-gray-400 py-8">
-                  No blocks in the blockchain yet. Propose a new block above!
-                </div>
-              )}
+                
+                {blockchain.length === 0 && (
+                  <div className="text-center text-gray-500 dark:text-gray-400 py-8 absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                    No blocks in the blockchain yet. Use the pending block on the right to propose the first block!
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 

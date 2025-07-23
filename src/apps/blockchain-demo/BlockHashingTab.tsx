@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface BlockHashingTabProps {
   currentTab: string;
@@ -14,12 +14,26 @@ function BlockHashingTab({
   const [blockData, setBlockData] = useState({
     blockNumber: 1,
     data: 'Hello World! This is some data in the block.',
-    validator: 'Alice (0x1a2b3c...)',
+    validator: 'You!',
     timestamp: Date.now()
   });
   
   const [currentHash, setCurrentHash] = useState<string>('');
   const [isHashExplicitlyCalculated, setIsHashExplicitlyCalculated] = useState<boolean>(false);
+
+  // Calculate hash automatically whenever block data changes
+  useEffect(() => {
+    const calculateCurrentHash = async () => {
+      if (calculateHash) {
+        const input = `${blockData.blockNumber}${blockData.data}${blockData.validator}${blockData.timestamp}`;
+        const hash = await calculateHash(input);
+        setCurrentHash(hash);
+        setIsHashExplicitlyCalculated(true);
+      }
+    };
+    
+    calculateCurrentHash();
+  }, [blockData.blockNumber, blockData.data, blockData.validator, blockData.timestamp, calculateHash]);
 
   const handleHashBlock = async () => {
     if (!calculateHash) return;
@@ -68,6 +82,18 @@ function BlockHashingTab({
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Block proposer:
+                  </label>
+                  <input
+                    type="text"
+                    value={blockData.validator}
+                    onChange={(e) => setBlockData(prev => ({ ...prev, validator: e.target.value }))}
+                    className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Timestamp:
                   </label>
                   <input
@@ -78,11 +104,12 @@ function BlockHashingTab({
                   />
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{new Date(blockData.timestamp).toLocaleString()}</p>
                 </div>
+                
               </div>
             </div>
 
             {/* Block Data */}
-            <div className="mb-6">
+            <div className="mb-6">              
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Data (try editing!):
@@ -96,15 +123,26 @@ function BlockHashingTab({
               </div>
             </div>
 
+            {/* Current Hash */}
+            <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+              <h4 className="text-lg font-bold mb-3 text-gray-800 dark:text-white">Current Block Hash</h4>
+              <div className="p-3 rounded-md font-mono text-sm break-all bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 text-green-800 dark:text-green-300">
+                {currentHash || 'Calculating...'}
+              </div>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                Hash updates automatically as you edit block data
+              </p>
+            </div>
+
             {/* Hash Block Section */}
             <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between mb-4">
-                <h4 className="text-lg font-bold text-gray-800 dark:text-white">Block Hash</h4>
+                <h4 className="text-lg font-bold text-gray-800 dark:text-white">Block Hash Details</h4>
                 <button
                   onClick={handleHashBlock}
                   className="px-4 py-2 font-medium rounded-lg transition-colors bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white"
                 >
-                  Hash Block
+                  Re-calculate Hash
                 </button>
               </div>
               
@@ -114,15 +152,12 @@ function BlockHashingTab({
                 </div>
               ) : (
                 <div className="p-3 rounded-md text-sm border bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 text-center">
-                  No hash calculated yet. Click "Hash Block" to create the block hash.
+                  Hash calculating automatically...
                 </div>
               )}
               
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                {isHashExplicitlyCalculated 
-                  ? 'Hash calculated! This creates a unique fingerprint of all block data.' 
-                  : 'Click "Hash Block" to calculate the cryptographic hash of all block components'
-                }
+                This creates a unique fingerprint of all block data - any change will result in a completely different hash
               </p>
             </div>
           </div>
@@ -131,12 +166,12 @@ function BlockHashingTab({
           <div className="mt-8 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-700 rounded-lg p-6">
             <h4 className="font-semibold text-purple-900 dark:text-purple-300 mb-2">How Block Hashing Works:</h4>
             <div className="text-sm text-purple-800 dark:text-purple-200 space-y-1">
-              <p>• <strong>Block Components</strong>: All block data (number, previous hash, data content, validator, timestamp) is combined</p>
+              <p>• <strong>Block Components</strong>: All block data (number, data content, block proposer, timestamp) is combined</p>
               <p>• <strong>Deterministic Process</strong>: Same block data always produces the same hash</p>
               <p>• <strong>Avalanche Effect</strong>: Changing any data completely changes the hash</p>
               <p>• <strong>Fixed Output</strong>: Hash is always 256 bits (64 hex characters) regardless of input size</p>
               <p>• <strong>Unique Fingerprint</strong>: Each unique block gets a unique hash - no two different blocks can have the same hash</p>
-              <p>• <strong>Next Step</strong>: Once hashed, this unique fingerprint can be cryptographically signed by the validator</p>
+              <p>• <strong>Next Step</strong>: Once hashed, this unique fingerprint can be cryptographically signed by the block proposer</p>
             </div>
           </div>
         </div>
