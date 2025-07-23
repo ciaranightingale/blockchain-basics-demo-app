@@ -763,7 +763,7 @@ function DecentralizedTab({
             <h4 className="font-semibold text-gray-900 dark:text-gray-300 mb-2">How Stake-Weighted Consensus Works:</h4>
             <div className="text-sm text-gray-800 dark:text-gray-300 space-y-1">
               <p>• <strong>Block Proposal</strong>: One validator proposes a new block to the network</p>
-              <p>• <strong>Stake-Weighted Voting</strong>: All validators attest YES or NO with their staked ETHr</p>
+              <p>• <strong>Stake-Weighted Voting</strong>: All validators attest YES or NO with their staked ETH</p>
               <p>• <strong>2/3 Threshold</strong>: Block needs 66.7% of total staked ETH to attest YES to finalize</p>
               <p>• <strong>All Must Vote</strong>: Every active validator must provide attestation (like a vote) before the block can be finalized</p>
               <p>• <strong>Security Model</strong>: Larger stakes have more influence but also more to lose if slashed</p>
