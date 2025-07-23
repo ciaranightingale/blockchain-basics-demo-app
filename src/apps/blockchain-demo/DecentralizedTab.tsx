@@ -207,6 +207,50 @@ function DecentralizedTab({
             <p className="text-gray-600 dark:text-gray-300">Manage validators and see how they participate in consensus. Stake up to 2048 ETH per validator.</p>
           </div>
 
+          {/* Step-by-Step Guide */}
+          <div className="mb-8 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-6">
+            <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-300 mb-4">
+              How to Propose & Finalize a Block
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+              <div className="flex items-start space-x-3">
+                <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold">1</div>
+                <div>
+                  <div className="font-medium text-blue-900 dark:text-blue-300">Select Transactions</div>
+                  <div className="text-blue-700 dark:text-blue-400">Choose transactions from the pending block on the right</div>
+                </div>
+              </div>
+              <div className="flex items-start space-x-3">
+                <div className="w-6 h-6 bg-purple-500 text-white rounded-full flex items-center justify-center text-xs font-bold">2</div>
+                <div>
+                  <div className="font-medium text-purple-900 dark:text-purple-300">Propose Block</div>
+                  <div className="text-purple-700 dark:text-purple-400">Click "Sign & Propose Block" to submit your proposal</div>
+                </div>
+              </div>
+              <div className="flex items-start space-x-3">
+                <div className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-xs font-bold">3</div>
+                <div>
+                  <div className="font-medium text-green-900 dark:text-green-300">Validators Attest</div>
+                  <div className="text-green-700 dark:text-green-400">Scroll down to have each validator vote YES/NO</div>
+                </div>
+              </div>
+            </div>
+            {!pendingProposal && selectedTransactions.length === 0 && (
+              <div className="mt-4 p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg border border-blue-300 dark:border-blue-600">
+                <div className="text-blue-800 dark:text-blue-300">
+                  <strong>Start here:</strong> Select transactions in the pending block (right side) to begin!
+                </div>
+              </div>
+            )}
+            {pendingProposal && (
+              <div className="mt-4 p-3 bg-amber-100 dark:bg-amber-900/30 rounded-lg border border-amber-300 dark:border-amber-600">
+                <div className="text-amber-800 dark:text-amber-300">
+                  <strong>Next step:</strong> Scroll down to the validators section and have each validator attest to the proposal!
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* PoS Blockchain Section */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border-2 border-blue-500 dark:border-blue-400 mb-8">
             <div className="flex items-center justify-between mb-4">
@@ -520,8 +564,17 @@ function DecentralizedTab({
           )}
 
           {/* Validators Section */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
-            <h3 className="text-xl font-semibold mb-4 dark:text-white">Your Validators</h3>
+          <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8 ${
+            pendingProposal ? 'ring-2 ring-amber-400 ring-opacity-50 border-amber-300' : ''
+          }`}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-semibold dark:text-white">Your Validators</h3>
+              {pendingProposal && (
+                <div className="bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300 px-3 py-1 rounded-full text-sm font-medium">
+                  Awaiting Attestations
+                </div>
+              )}
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {validators.map((validator, validatorIndex) => (
                 <div key={validatorIndex} className={`border-2 rounded-lg p-4 ${
