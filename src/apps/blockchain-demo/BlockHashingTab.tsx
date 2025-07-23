@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 interface BlockHashingTabProps {
   currentTab: string;
@@ -19,21 +19,8 @@ function BlockHashingTab({
   });
   
   const [currentHash, setCurrentHash] = useState<string>('');
-  const [isHashExplicitlyCalculated, setIsHashExplicitlyCalculated] = useState<boolean>(false);
-
-  // Calculate hash automatically whenever block data changes
-  useEffect(() => {
-    const calculateCurrentHash = async () => {
-      if (calculateHash) {
-        const input = `${blockData.blockNumber}${blockData.data}${blockData.validator}${blockData.timestamp}`;
-        const hash = await calculateHash(input);
-        setCurrentHash(hash);
-        setIsHashExplicitlyCalculated(true);
-      }
-    };
-    
-    calculateCurrentHash();
-  }, [blockData.blockNumber, blockData.data, blockData.validator, blockData.timestamp, calculateHash]);
+  const [isHashCalculated, setIsHashCalculated] = useState<boolean>(false);
+  const [isDataModified, setIsDataModified] = useState<boolean>(false);
 
   const handleHashBlock = async () => {
     if (!calculateHash) return;
@@ -41,14 +28,14 @@ function BlockHashingTab({
     const input = `${blockData.blockNumber}${blockData.data}${blockData.validator}${blockData.timestamp}`;
     const hash = await calculateHash(input);
     setCurrentHash(hash);
-    setIsHashExplicitlyCalculated(true);
+    setIsHashCalculated(true);
+    setIsDataModified(false);
   };
 
   const handleDataChange = (newData: string) => {
     setBlockData(prev => ({ ...prev, data: newData }));
-    
-    if (isHashExplicitlyCalculated) {
-      setIsHashExplicitlyCalculated(false);
+    if (isHashCalculated) {
+      setIsDataModified(true);
     }
   };
 
@@ -110,17 +97,6 @@ function BlockHashingTab({
               </div>
             </div>
 
-            {/* Current Hash */}
-            <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-              <h4 className="text-lg font-bold mb-3 text-gray-800 dark:text-white">Current Block Hash</h4>
-              <div className="p-3 rounded-md font-mono text-sm break-all bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 text-green-800 dark:text-green-300">
-                {currentHash || 'Calculating...'}
-              </div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                Hash updates automatically as you edit block data
-              </p>
-            </div>
-
             {/* Hash Block Section */}
             <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between mb-4">
@@ -129,22 +105,29 @@ function BlockHashingTab({
                   onClick={handleHashBlock}
                   className="px-4 py-2 font-medium rounded-lg transition-colors bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white"
                 >
-                  Re-calculate Hash
+                  Calculate Hash
                 </button>
               </div>
               
-              {isHashExplicitlyCalculated ? (
-                <div className="p-3 rounded-md font-mono text-sm break-all border bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700 text-green-800 dark:text-green-300">
+              {isHashCalculated ? (
+                <div className={`p-3 rounded-md font-mono text-sm break-all border ${
+                  isDataModified 
+                    ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700 text-red-800 dark:text-red-300'
+                    : 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700 text-green-800 dark:text-green-300'
+                }`}>
                   {currentHash}
                 </div>
               ) : (
                 <div className="p-3 rounded-md text-sm border bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 text-center">
-                  Hash calculating automatically...
+                  Click "Calculate Hash" to generate the block hash
                 </div>
               )}
               
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                This creates a unique fingerprint of all block data - any change will result in a completely different hash
+                {isDataModified 
+                  ? "⚠️ Data has been modified - hash is now invalid! Click 'Calculate Hash' to update."
+                  : "This creates a unique fingerprint of all block data - any change will result in a completely different hash"
+                }
               </p>
             </div>
           </div>
