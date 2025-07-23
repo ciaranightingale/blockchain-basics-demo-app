@@ -205,13 +205,13 @@ const WhyBlockchainApp: React.FC = () => {
     // Handle "Learn more about threats to civil liberties: URL"
     result = result.replace(
       /(Learn more about threats to civil liberties): (https?:\/\/[^\s]+)/g,
-      (match, linkText, url) => `LINK1:${linkText}|${url}`
+      (_, linkText, url) => `LINK1:${linkText}|${url}`
     );
     
     // Handle "mysterious deaths of political opponents: URL"
     result = result.replace(
       /(mysterious deaths of political opponents): (https?:\/\/[^\s]+)/g,
-      (match, linkText, url) => `LINK2:${linkText}|${url}`
+      (_, linkText, url) => `LINK2:${linkText}|${url}`
     );
     
     // Split and render

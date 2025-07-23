@@ -80,7 +80,7 @@ function BlockHashingTab({
                   />
                 </div>
                 
-                <div>
+                {/* <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Block proposer:
                   </label>
@@ -90,21 +90,8 @@ function BlockHashingTab({
                     onChange={(e) => setBlockData(prev => ({ ...prev, validator: e.target.value }))}
                     className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Timestamp:
-                  </label>
-                  <input
-                    type="number"
-                    value={blockData.timestamp}
-                    onChange={(e) => setBlockData(prev => ({ ...prev, timestamp: parseInt(e.target.value) || Date.now() }))}
-                    className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  />
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{new Date(blockData.timestamp).toLocaleString()}</p>
-                </div>
-                
+                </div> */}
+
               </div>
             </div>
 
@@ -166,7 +153,7 @@ function BlockHashingTab({
           <div className="mt-8 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-700 rounded-lg p-6">
             <h4 className="font-semibold text-purple-900 dark:text-purple-300 mb-2">How Block Hashing Works:</h4>
             <div className="text-sm text-purple-800 dark:text-purple-200 space-y-1">
-              <p>• <strong>Block Components</strong>: All block data (number, data content, block proposer, timestamp) is combined</p>
+              <p>• <strong>Block Components</strong>: All block data (block number and associated data) is combined</p>
               <p>• <strong>Deterministic Process</strong>: Same block data always produces the same hash</p>
               <p>• <strong>Avalanche Effect</strong>: Changing any data completely changes the hash</p>
               <p>• <strong>Fixed Output</strong>: Hash is always 256 bits (64 hex characters) regardless of input size</p>

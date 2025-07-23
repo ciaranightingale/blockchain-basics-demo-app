@@ -17,6 +17,8 @@ interface DecentralizedTabProps {
   handleTxSelection: (txId: number, isSelected: boolean) => void;
   blockchain: any[];
   calculateHash: (input: string) => Promise<string>;
+  handleDataChange: (blockIndex: number, newData: string) => void;
+  handleValidateBlock: (blockIndex: number) => void;
 }
 
 function DecentralizedTab({ 
@@ -34,7 +36,9 @@ function DecentralizedTab({
   selectedTransactions,
   handleTxSelection,
   blockchain,
-  calculateHash
+  calculateHash,
+  handleDataChange,
+  handleValidateBlock
 }: DecentralizedTabProps) {
   const { showSuccess, showError, showInfo, showWarning } = useToast();
   const [newValidatorName, setNewValidatorName] = useState('');
@@ -274,15 +278,18 @@ function DecentralizedTab({
                           <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                             Transactions:
                           </label>
-                          <div className={`w-full h-20 p-2 border rounded text-xs font-mono overflow-y-auto ${
-                            block.isValid === false
-                              ? 'border-red-300 bg-red-50 text-red-800 dark:border-red-500 dark:bg-red-900/20 dark:text-red-300' 
-                              : block.isValid === 'unsigned'
-                              ? 'border-yellow-300 bg-yellow-50 text-yellow-800 dark:border-yellow-500 dark:bg-yellow-900/20 dark:text-yellow-300'
-                              : 'border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white'
-                          }`}>
-                            {block.data || 'No transactions'}
-                          </div>
+                          <textarea 
+                            value={block.data || ''}
+                            onChange={(e) => handleDataChange(index, e.target.value)}
+                            className={`w-full h-20 p-2 border rounded text-xs font-mono resize-none ${
+                              block.isValid === false
+                                ? 'border-red-300 bg-red-50 text-red-800 dark:border-red-500 dark:bg-red-900/20 dark:text-red-300' 
+                                : block.isValid === 'unsigned'
+                                ? 'border-yellow-300 bg-yellow-50 text-yellow-800 dark:border-yellow-500 dark:bg-yellow-900/20 dark:text-yellow-300'
+                                : 'border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700 dark:text-white'
+                            }`}
+                            placeholder="No transactions"
+                          />
                         </div>
 
                         {/* Hashes */}
@@ -312,6 +319,22 @@ function DecentralizedTab({
                             </div>
                           </div>
                         </div>
+                        
+                        {/* Sign Block Button */}
+                        <div className="pt-2">
+                          <button 
+                            onClick={() => handleValidateBlock(index)}
+                            className={`w-full px-3 py-2 text-xs font-medium rounded transition-colors ${
+                              block.isValid === false
+                                ? 'bg-red-500 hover:bg-red-600 text-white dark:bg-red-600 dark:hover:bg-red-700'
+                                : block.isValid === 'unsigned'
+                                ? 'bg-yellow-500 hover:bg-yellow-600 text-white dark:bg-yellow-600 dark:hover:bg-yellow-700'
+                                : 'bg-green-500 hover:bg-green-600 text-white dark:bg-green-600 dark:hover:bg-green-700'
+                            }`}
+                          >
+                            {block.isValid === false ? 'Sign Block' : block.isValid === 'unsigned' ? 'Sign Block' : 'Signed'}
+                          </button>
+                        </div>
                       </div>
                     </div>
                     
@@ -340,7 +363,7 @@ function DecentralizedTab({
 
                       {/* Proposer Selection */}
                       <div className="mb-2">
-                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Proposer:</label>
+                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Proposer: {selectedProposer ? selectedProposer.split('(')[0] : autoSelectedValidator.split('(')[0]}</label>
                         <select
                           value={selectedProposer}
                           onChange={(e) => setSelectedProposer(e.target.value)}
@@ -353,9 +376,9 @@ function DecentralizedTab({
                             </option>
                           ))}
                         </select>
-                        <div className="text-xs text-orange-700 dark:text-orange-300 mt-1">
-                          Selected: {selectedProposer ? selectedProposer.split('(')[0] : autoSelectedValidator.split('(')[0]}
-                        </div>
+                        {/* <div className="text-xs text-orange-700 dark:text-orange-300 mt-1">
+                          Selected: 
+                        </div> */}
                       </div>
 
                       {/* Transaction Selection */}
@@ -385,9 +408,8 @@ function DecentralizedTab({
                           )}
                         </div>
                       </div>
-
                       {/* Hashes */}
-                      <div className="space-y-2 mt-auto">
+                      <div>
                         <div>
                           <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">Previous Hash:</label>
                           <div className="text-xs font-mono break-all p-1 rounded overflow-auto max-h-16 text-gray-600 bg-gray-100 dark:text-gray-300 dark:bg-gray-700">
@@ -400,27 +422,25 @@ function DecentralizedTab({
                             {currentHash || 'Select transactions to calculate...'}
                           </div>
                         </div>
-                        {signature && (
-                          <div>
-                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">Signature:</label>
-                            <div className="text-xs font-mono break-all p-1 rounded overflow-auto max-h-16 text-orange-800 bg-orange-100 border border-orange-300 dark:text-orange-300 dark:bg-orange-900/20 dark:border-orange-500">
-                              Signed at {new Date(signature.timestamp).toLocaleTimeString()}
+                        <div>
+                          {signature && (
+                            <div className="mb-2">
+                              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">Signature:</label>
+                              <div className="text-xs font-mono break-all p-1 rounded overflow-auto max-h-16 text-orange-800 bg-orange-100 border border-orange-300 dark:text-orange-300 dark:bg-orange-900/20 dark:border-orange-500">
+                                Signed at {new Date(signature.timestamp).toLocaleTimeString()}
+                              </div>
                             </div>
-                          </div>
-                        )}
-                        <div className="mt-4 pt-4 border-t border-orange-300 dark:border-orange-500">
-                          <button
-                            onClick={handleSignAndProposeBlock}
-                            disabled={pendingProposal || selectedTransactions.length === 0}
-                            className="w-full px-3 py-2 font-medium rounded transition-colors bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white text-xs"
-                          >
-                            {pendingProposal ? 'Proposing...' : 'Sign & Propose Block'}
-                          </button>
-                          {selectedTransactions.length === 0 && (
-                            <p className="text-xs text-orange-600 dark:text-orange-400 text-center mt-2">
-                              Select transactions above
-                            </p>
                           )}
+                          <div className="pt-2">
+                            <button
+                              onClick={handleSignAndProposeBlock}
+                              disabled={pendingProposal || selectedTransactions.length === 0}
+                              className="w-full px-3 py-2 font-medium rounded transition-colors bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white text-xs"
+                            >
+                              {pendingProposal ? 'Proposing...' : 'Sign & Propose Block'}
+                            </button>
+                            {selectedTransactions.length === 0}
+                          </div>
                         </div>
                       </div>
                     </div>

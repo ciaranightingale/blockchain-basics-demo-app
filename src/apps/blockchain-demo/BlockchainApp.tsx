@@ -645,6 +645,8 @@ const EthereumPoSDemo = () => {
           handleTxSelection={handleTxSelection}
           blockchain={blockchain}
           calculateHash={calculateHash}
+          handleDataChange={handleBlockchainDataChange}
+          handleValidateBlock={handleValidateBlock}
         />
       </div>
     </div>
