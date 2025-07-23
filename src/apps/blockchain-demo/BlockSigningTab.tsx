@@ -105,11 +105,11 @@ function BlockSigningTab({
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Validator:
+                    Block proposer:
                   </label>
                   <input
                     type="text"
-                    value={blockData.validator}
+                    value="You!"
                     onChange={(e) => setBlockData(prev => ({ ...prev, validator: e.target.value }))}
                     className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
@@ -132,9 +132,7 @@ function BlockSigningTab({
             </div>
 
             {/* Transaction Data */}
-            <div className="mb-6">
-              <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">Transaction Data</h3>
-              
+            <div className="mb-6">              
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Transactions (try editing!):
