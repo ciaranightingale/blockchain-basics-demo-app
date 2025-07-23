@@ -747,8 +747,6 @@ function DecentralizedTab({
 
             {/* Information Box */}
             <div className="mt-6 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-700 rounded-lg p-4">
-              <h4 className="font-semibold text-purple-900 dark:text-purple-300 mb-3">Enhanced Staking System & Consensus:</h4>
-              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <h5 className="font-medium text-purple-900 dark:text-purple-300 mb-2">Staking Features:</h5>
