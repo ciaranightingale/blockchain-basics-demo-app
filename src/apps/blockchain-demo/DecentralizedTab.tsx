@@ -504,7 +504,7 @@ function DecentralizedTab({
                           <strong>Required:</strong> {requiredStake.toFixed(1)} ETH (66.7%)
                         </p>
                         <p className="text-sm text-amber-800 dark:text-amber-300">
-                          <strong>Status:</strong> {votedCount === totalValidators ? (yesStake >= requiredStake ? 'Ready to Finalize' : 'Will be Rejected') : 'Awaiting Votes'}
+                          <strong>Status:</strong> {votedCount === totalValidators ? (yesStake >= requiredStake ? 'Ready to Finalize' : 'Will be Rejected') : 'Awaiting Attestations'}
                         </p>
                       </>
                     );
@@ -540,7 +540,7 @@ function DecentralizedTab({
                   <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">Stake: {validator.stake} ETH</p>
                   <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">Address: {validator.address}</p>
                   <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
-                    Vote Power: {validator.isActive ? ((validator.stake / validators.filter(v => v.isActive).reduce((sum, v) => sum + v.stake, 0)) * 100).toFixed(1) : '0'}%
+                    Attestation Power: {validator.isActive ? ((validator.stake / validators.filter(v => v.isActive).reduce((sum, v) => sum + v.stake, 0)) * 100).toFixed(1) : '0'}%
                   </p>
                   
                   {validator.isMalicious && (
@@ -615,7 +615,7 @@ function DecentralizedTab({
                   {/* Voting Buttons - only show for active validators when there's a pending proposal */}
                   {pendingProposal && validator.isActive && (
                     <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
-                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">Vote on pending proposal:</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">Attest to proposal:</p>
                       {!validatorVotes[validator.name] ? (
                         <div className="grid grid-cols-2 gap-2">
                           <button
@@ -763,9 +763,9 @@ function DecentralizedTab({
             <h4 className="font-semibold text-gray-900 dark:text-gray-300 mb-2">How Stake-Weighted Consensus Works:</h4>
             <div className="text-sm text-gray-800 dark:text-gray-300 space-y-1">
               <p>• <strong>Block Proposal</strong>: One validator proposes a new block to the network</p>
-              <p>• <strong>Stake-Weighted Voting</strong>: All validators vote YES or NO with their staked ETH as voting power</p>
-              <p>• <strong>2/3 Threshold</strong>: Block needs 66.7% of total staked ETH to vote YES to finalize</p>
-              <p>• <strong>All Must Vote</strong>: Every active validator must cast a vote before the block can be finalized</p>
+              <p>• <strong>Stake-Weighted Voting</strong>: All validators attest YES or NO with their staked ETH as voting power</p>
+              <p>• <strong>2/3 Threshold</strong>: Block needs 66.7% of total staked ETH to attest YES to finalize</p>
+              <p>• <strong>All Must Vote</strong>: Every active validator must provide attestation (like a vote) before the block can be finalized</p>
               <p>• <strong>Security Model</strong>: Larger stakes have more influence but also more to lose if slashed</p>
               <p>• <strong>Majority Attack</strong>: An attacker would need 2/3+ of all staked ETH to control consensus</p>
               <p>• <strong>Economic Security</strong>: Makes attacks extremely expensive and self-defeating</p>
