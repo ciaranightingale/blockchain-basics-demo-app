@@ -202,23 +202,35 @@ const WhyBlockchainApp: React.FC = () => {
     // Simple approach: replace specific patterns with links
     let result = message;
     
+    // Handle "learn more about Zimbabwe's hyperinflation: URL"
+    result = result.replace(
+      /(learn more about Zimbabwe's hyperinflation): (https?:\/\/[^\s]+)/g,
+      (_, linkText, url) => `LINK1:${linkText}|${url}`
+    );
+    
     // Handle "Learn more about threats to civil liberties: URL"
     result = result.replace(
       /(Learn more about threats to civil liberties): (https?:\/\/[^\s]+)/g,
-      (_, linkText, url) => `LINK1:${linkText}|${url}`
+      (_, linkText, url) => `LINK2:${linkText}|${url}`
     );
     
     // Handle "mysterious deaths of political opponents: URL"
     result = result.replace(
       /(mysterious deaths of political opponents): (https?:\/\/[^\s]+)/g,
-      (_, linkText, url) => `LINK2:${linkText}|${url}`
+      (_, linkText, url) => `LINK3:${linkText}|${url}`
+    );
+    
+    // Handle "Learn more about Nigeria's cash withdrawal policy: URL"
+    result = result.replace(
+      /(Learn more about Nigeria's cash withdrawal policy): (https?:\/\/[^\s]+)/g,
+      (_, linkText, url) => `LINK4:${linkText}|${url}`
     );
     
     // Split and render
-    const parts = result.split(/(LINK[12]:[^|]+\|[^\s]+)/g);
+    const parts = result.split(/(LINK[1-4]:[^|]+\|[^\s]+)/g);
     
     return parts.map((part, index) => {
-      const linkMatch = part.match(/LINK[12]:([^|]+)\|(.+)/);
+      const linkMatch = part.match(/LINK[1-4]:([^|]+)\|(.+)/);
       if (linkMatch) {
         const linkText = linkMatch[1];
         const url = linkMatch[2];
@@ -350,7 +362,7 @@ const WhyBlockchainApp: React.FC = () => {
                     ? 'Attempted' 
                     : processingChallenges.has(currentChallenge.id)
                     ? 'Processing...' 
-                    : 'Send Money'
+                    : currentChallenge.id === 7 ? 'Withdraw Money' : 'Send Money'
                   }
                 </button>
               </div>

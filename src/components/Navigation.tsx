@@ -11,10 +11,10 @@ const Navigation = () => {
 
   const navItems = [
     { path: '/', label: 'Home', icon: Home },
+    { path: '/blockchain-basics', label: 'Why Blockchain', icon: AlertCircle },
     { path: '/blockchain', label: 'Blockchain Demo', icon: Blocks },
     { path: '/crypto', label: 'Crypto Demo', icon: Coins },
     { path: '/ecdsa', label: 'ECDSA Signatures', icon: Key },
-    { path: '/blockchain-basics', label: 'Why Blockchain', icon: AlertCircle },
   ];
 
   return (

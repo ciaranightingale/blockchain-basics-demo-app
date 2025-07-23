@@ -4,6 +4,13 @@ import { Blocks, Coins, Key, ArrowRight, AlertCircle } from 'lucide-react';
 const HomePage = () => {
   const apps = [
     {
+      title: 'Why Blockchain',
+      description: 'Experience real-world problems with traditional finance that blockchain solves.',
+      path: '/blockchain-basics',
+      icon: AlertCircle,
+      color: 'bg-red-500',
+    },
+    {
       title: 'Blockchain Demo',
       description: 'Learn about blockchain fundamentals, consensus mechanisms, and .',
       path: '/blockchain',
@@ -23,13 +30,6 @@ const HomePage = () => {
       path: '/ecdsa',
       icon: Key,
       color: 'bg-purple-500',
-    },
-    {
-      title: 'Why Blockchain',
-      description: 'Experience real-world problems with traditional finance that blockchain solves.',
-      path: '/blockchain-basics',
-      icon: AlertCircle,
-      color: 'bg-red-500',
     },
   ];
 
