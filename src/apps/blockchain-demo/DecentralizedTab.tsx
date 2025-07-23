@@ -750,8 +750,8 @@ function DecentralizedTab({
               <h4 className="font-semibold text-purple-900 dark:text-purple-300 mb-2">Enhanced Staking System:</h4>
               <div className="text-sm text-purple-800 dark:text-purple-300 space-y-1">
                 <p>• <strong>Flexible Staking</strong>: Stake anywhere from 32 ETH up to 2048 ETH per validator</p>
-                <p>• <strong>Proportional Power</strong>: Higher stake = more voting power in consensus decisions</p>
-                <p>• <strong>Stake-Based Finality</strong>: Blocks finalize when 2/3 of total staked ETH votes YES</p>
+                <p>• <strong>Proportional Power</strong>: Higher stake = more attestation power in consensus decisions</p>
+                <p>• <strong>Stake-Based Finality</strong>: Blocks finalize when 2/3 of total staked ETH attest YES</p>
                 <p>• <strong>Economic Security</strong>: Larger stakes increase network security but also slashing risk</p>
                 <p>• <strong>Malicious Testing</strong>: Toggle validators malicious to test attack scenarios</p>
               </div>
@@ -763,7 +763,7 @@ function DecentralizedTab({
             <h4 className="font-semibold text-gray-900 dark:text-gray-300 mb-2">How Stake-Weighted Consensus Works:</h4>
             <div className="text-sm text-gray-800 dark:text-gray-300 space-y-1">
               <p>• <strong>Block Proposal</strong>: One validator proposes a new block to the network</p>
-              <p>• <strong>Stake-Weighted Voting</strong>: All validators attest YES or NO with their staked ETH as voting power</p>
+              <p>• <strong>Stake-Weighted Voting</strong>: All validators attest YES or NO with their staked ETHr</p>
               <p>• <strong>2/3 Threshold</strong>: Block needs 66.7% of total staked ETH to attest YES to finalize</p>
               <p>• <strong>All Must Vote</strong>: Every active validator must provide attestation (like a vote) before the block can be finalized</p>
               <p>• <strong>Security Model</strong>: Larger stakes have more influence but also more to lose if slashed</p>
