@@ -747,28 +747,29 @@ function DecentralizedTab({
 
             {/* Information Box */}
             <div className="mt-6 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-700 rounded-lg p-4">
-              <h4 className="font-semibold text-purple-900 dark:text-purple-300 mb-2">Enhanced Staking System:</h4>
-              <div className="text-sm text-purple-800 dark:text-purple-300 space-y-1">
-                <p>• <strong>Flexible Staking</strong>: Stake anywhere from 32 ETH up to 2048 ETH per validator</p>
-                <p>• <strong>Proportional Power</strong>: Higher stake = more attestation power in consensus decisions</p>
-                <p>• <strong>Stake-Based Finality</strong>: Blocks finalize when 2/3 of total staked ETH attest YES</p>
-                <p>• <strong>Economic Security</strong>: Larger stakes increase network security but also slashing risk</p>
-                <p>• <strong>Malicious Testing</strong>: Toggle validators malicious to test attack scenarios</p>
+              <h4 className="font-semibold text-purple-900 dark:text-purple-300 mb-3">Enhanced Staking System & Consensus:</h4>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h5 className="font-medium text-purple-900 dark:text-purple-300 mb-2">Staking Features:</h5>
+                  <div className="text-sm text-purple-800 dark:text-purple-300 space-y-1">
+                    <p>• <strong>Flexible Staking</strong>: Stake 32-2048 ETH per validator</p>
+                    <p>• <strong>Proportional Power</strong>: Higher stake = more attestation power</p>
+                    <p>• <strong>Economic Security</strong>: More skin in the game with higher personal slashing risk</p>
+                    <p>• <strong>Malicious Testing</strong>: Toggle validators malicious to test attack scenarios</p>
+                  </div>
+                </div>
+                
+                <div>
+                  <h5 className="font-medium text-purple-900 dark:text-purple-300 mb-2">Consensus Process:</h5>
+                  <div className="text-sm text-purple-800 dark:text-purple-300 space-y-1">
+                    <p>• <strong>Block Proposal</strong>: One validator proposes a new block</p>
+                    <p>• <strong>Stake-Weighted Voting</strong>: All validators attest YES/NO with staked ETH</p>
+                    <p>• <strong>2/3 Threshold</strong>: Block needs 66.7% of total staked ETH to finalize</p>
+                    <p>• <strong>Majority Attack</strong>: Attacker needs 2/3+ of all staked ETH to control consensus</p>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-
-          {/* Educational Note */}
-          <div className="mt-8 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
-            <h4 className="font-semibold text-gray-900 dark:text-gray-300 mb-2">How Stake-Weighted Consensus Works:</h4>
-            <div className="text-sm text-gray-800 dark:text-gray-300 space-y-1">
-              <p>• <strong>Block Proposal</strong>: One validator proposes a new block to the network</p>
-              <p>• <strong>Stake-Weighted Voting</strong>: All validators attest YES or NO with their staked ETH</p>
-              <p>• <strong>2/3 Threshold</strong>: Block needs 66.7% of total staked ETH to attest YES to finalize</p>
-              <p>• <strong>All Must Vote</strong>: Every active validator must provide attestation (like a vote) before the block can be finalized</p>
-              <p>• <strong>Security Model</strong>: Larger stakes have more influence but also more to lose if slashed</p>
-              <p>• <strong>Majority Attack</strong>: An attacker would need 2/3+ of all staked ETH to control consensus</p>
-              <p>• <strong>Economic Security</strong>: Makes attacks extremely expensive and self-defeating</p>
             </div>
           </div>
         </div>
