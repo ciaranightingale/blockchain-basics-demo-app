@@ -10,8 +10,11 @@ const Hash = ({ currentTab, hashData, computedHash, setHashData }: HashProps) =>
     <>
         {currentTab === 'hash' && (
             <div className="max-w-2xl mx-auto">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border dark:border-gray-700">
-                <h2 className="text-2xl font-bold mb-4 text-center text-gray-800 dark:text-white">Keccak256 Hash</h2>
+                <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">Keccak256 Hashing</h2>
+                <p className="text-gray-600 dark:text-gray-300">Hash a string using Ethereum's keccak256 hash</p>
+            </div>
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border dark:border-gray-700">
                 <div className="space-y-4">
                 <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
