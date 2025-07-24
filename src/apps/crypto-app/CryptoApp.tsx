@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { ToastProvider } from '../../components/Toast';
 import ProgressIndicator from './ProgressIndicator';
 import CompletionModal from './CompletionModal';
 import WalletDemo from './WalletDemo';
@@ -122,52 +123,54 @@ const CryptoDemoApp = () => {
   const CurrentDemoComponent = demos[currentDemo].component;
 
   return (
-    <div className="min-h-screen pb-32">
-      <div className="container mx-auto px-4 py-6 sm:py-8">
-        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2 text-gray-800 dark:text-white">
-          Crypto Demo
-        </h1>
-        <p className="text-center text-gray-600 dark:text-gray-300 mb-6 sm:mb-8 text-sm sm:text-base">
-          Interactive demonstrations of crypto wallets, DEX trading, and DeFi staking
-        </p>
-        
-        {/* Central Tab Navigation */}
-        <div className="flex justify-center mb-6 sm:mb-8">
-          <nav className="inline-flex flex-wrap justify-center gap-1 bg-white dark:bg-gray-800 rounded-lg p-1 shadow-md border dark:border-gray-700">
-            {demos.map((demo, index) => (
-              <button
-                key={demo.id}
-                onClick={() => goToDemo(index)}
-                className={`px-4 py-3 rounded-md font-medium transition-all text-sm ${
-                  currentDemo === index
-                    ? 'bg-blue-500 text-white shadow-md'
-                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
-                }`}
-              >
-                {demo.title}
-              </button>
-            ))}
-          </nav>
-        </div>
-        
-        <div className="pb-32"> {/* Add padding bottom for fixed navigation */}
-          <CurrentDemoComponent onActionCompleted={markCompleted} />
-        </div>
+    <ToastProvider>
+      <div className="min-h-screen pb-32">
+        <div className="container mx-auto px-4 py-6 sm:py-8">
+          <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2 text-gray-800 dark:text-white">
+            Crypto Demo
+          </h1>
+          <p className="text-center text-gray-600 dark:text-gray-300 mb-6 sm:mb-8 text-sm sm:text-base">
+            Interactive demonstrations of crypto wallets, DEX trading, and DeFi staking
+          </p>
+          
+          {/* Central Tab Navigation */}
+          <div className="flex justify-center mb-6 sm:mb-8">
+            <nav className="inline-flex flex-wrap justify-center gap-1 bg-white dark:bg-gray-800 rounded-lg p-1 shadow-md border dark:border-gray-700">
+              {demos.map((demo, index) => (
+                <button
+                  key={demo.id}
+                  onClick={() => goToDemo(index)}
+                  className={`px-4 py-3 rounded-md font-medium transition-all text-sm ${
+                    currentDemo === index
+                      ? 'bg-blue-500 text-white shadow-md'
+                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  {demo.title}
+                </button>
+              ))}
+            </nav>
+          </div>
+          
+          <div className="pb-32"> {/* Add padding bottom for fixed navigation */}
+            <CurrentDemoComponent onActionCompleted={markCompleted} />
+          </div>
 
-        <ProgressIndicator 
-          demos={demos}
-          currentDemo={currentDemo}
-          nextDemo={nextDemo}
-          prevDemo={prevDemo}
-          getDemoCompletionStatus={getDemoCompletionStatus}
-        />
+          <ProgressIndicator 
+            demos={demos}
+            currentDemo={currentDemo}
+            nextDemo={nextDemo}
+            prevDemo={prevDemo}
+            getDemoCompletionStatus={getDemoCompletionStatus}
+          />
 
-        <CompletionModal 
-          isOpen={showCompletionModal}
-          onClose={() => setShowCompletionModal(false)}
-        />
+          <CompletionModal 
+            isOpen={showCompletionModal}
+            onClose={() => setShowCompletionModal(false)}
+          />
+        </div>
       </div>
-    </div>
+    </ToastProvider>
   );
 };
 

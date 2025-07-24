@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { PiggyBank, TrendingUp, Clock, Award, Plus, Minus } from 'lucide-react';
 import TransactionModal from './TransactionModal';
-import { useToast } from './Toast';
+import { useToast } from '../../components/Toast';
 
 interface StakingPool {
   id: string;
@@ -63,8 +63,12 @@ const StakingDemo = ({ onActionCompleted }: StakingDemoProps) => {
   const [transactionData, setTransactionData] = useState<TransactionData | null>(null);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [currentAction, setCurrentAction] = useState<string>(''); // 'stake', 'unstake', 'claim'
+  
+  // Error states for inline validation
+  const [stakeAmountError, setStakeAmountError] = useState<string>('');
+  const [unstakeAmountError, setUnstakeAmountError] = useState<string>('');
 
-  const { showToast, ToastComponent } = useToast();
+  const { showToast } = useToast();
 
   const [userBalances, setUserBalances] = useState<UserBalances>({
     ETH: 5.25,
@@ -146,18 +150,21 @@ const StakingDemo = ({ onActionCompleted }: StakingDemoProps) => {
     
     const amount = parseFloat(stakeAmount);
     
+    // Clear previous errors
+    setStakeAmountError('');
+    
     if (!stakeAmount || amount <= 0) {
-      showToast('Please enter a valid amount', 'error');
+      setStakeAmountError('Please enter a valid amount');
       return;
     }
 
     if (amount < selectedPool.minStake) {
-      showToast(`Minimum stake amount is ${selectedPool.minStake} ${selectedPool.token}`, 'error');
+      setStakeAmountError(`Minimum stake amount is ${selectedPool.minStake} ${selectedPool.token}`);
       return;
     }
 
     if (amount > userBalances[selectedPool.token]) {
-      showToast('Insufficient balance', 'error');
+      setStakeAmountError('Insufficient balance');
       return;
     }
 
@@ -189,8 +196,16 @@ const StakingDemo = ({ onActionCompleted }: StakingDemoProps) => {
     
     const amount = parseFloat(unstakeAmount);
     
-    if (!unstakeAmount || amount <= 0 || amount > userStakes[selectedPool.id].amount) {
-      showToast('Invalid unstake amount', 'error');
+    // Clear previous errors
+    setUnstakeAmountError('');
+    
+    if (!unstakeAmount || amount <= 0) {
+      setUnstakeAmountError('Please enter a valid amount');
+      return;
+    }
+    
+    if (amount > userStakes[selectedPool.id].amount) {
+      setUnstakeAmountError('Amount exceeds staked balance');
       return;
     }
 
@@ -490,7 +505,7 @@ const StakingDemo = ({ onActionCompleted }: StakingDemoProps) => {
                 
                 <div className="mb-6">
                   <div className="flex items-center justify-between mb-2">
-                    <label className="text-sm font-medium text-gray-700">Amount to Stake</label>
+                    <label className="text-sm text-gray-500">Amount to Stake</label>
                     <span className="text-sm text-gray-500">
                       Balance: {userBalances[selectedPool.token].toFixed(4)} {selectedPool.token}
                     </span>
@@ -498,13 +513,21 @@ const StakingDemo = ({ onActionCompleted }: StakingDemoProps) => {
                   <input
                     type="number"
                     value={stakeAmount}
-                    onChange={(e) => setStakeAmount(e.target.value)}
+                    onChange={(e) => {
+                      setStakeAmount(e.target.value);
+                      if (stakeAmountError) setStakeAmountError('');
+                    }}
                     placeholder={`Min: ${selectedPool.minStake} ${selectedPool.token}`}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg"
+                    className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg ${
+                      stakeAmountError ? 'border-red-300 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'
+                    } bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
                   />
+                  {stakeAmountError && (
+                    <p className="mt-1 text-sm text-red-600 dark:text-red-400">{stakeAmountError}</p>
+                  )}
                   <button
                     onClick={() => setStakeAmount(userBalances[selectedPool.token].toString())}
-                    className="mt-2 text-sm text-blue-600 hover:text-blue-700"
+                    className="mt-2 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-500"
                   >
                     Use Max Balance
                   </button>
@@ -566,11 +589,19 @@ const StakingDemo = ({ onActionCompleted }: StakingDemoProps) => {
                   <input
                     type="number"
                     value={unstakeAmount}
-                    onChange={(e) => setUnstakeAmount(e.target.value)}
+                    onChange={(e) => {
+                      setUnstakeAmount(e.target.value);
+                      if (unstakeAmountError) setUnstakeAmountError('');
+                    }}
                     placeholder="0.0"
                     max={userStakes[selectedPool.id].amount}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg"
+                    className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg ${
+                      unstakeAmountError ? 'border-red-300 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'
+                    } bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
                   />
+                  {unstakeAmountError && (
+                    <p className="mt-1 text-sm text-red-600 dark:text-red-400">{unstakeAmountError}</p>
+                  )}
                   <button
                     onClick={() => setUnstakeAmount(userStakes[selectedPool.id].amount.toString())}
                     className="mt-2 text-sm text-blue-600 hover:text-blue-700"
@@ -622,7 +653,6 @@ const StakingDemo = ({ onActionCompleted }: StakingDemoProps) => {
           isProcessing={isProcessing}
         />
 
-        <ToastComponent />
       </div>
     </div>
   );

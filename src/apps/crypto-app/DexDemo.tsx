@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { ArrowRightLeft, Settings, Info, ChevronDown } from 'lucide-react';
 import TransactionModal from './TransactionModal';
-import { useToast } from './Toast';
+import { useToast } from '../../components/Toast';
 
 interface Token {
   name: string;
@@ -41,8 +41,11 @@ const DexDemo = ({ onActionCompleted }: DexDemoProps) => {
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
   const [isSwapping, setIsSwapping] = useState<boolean>(false);
   const [transactionData, setTransactionData] = useState<TransactionData | null>(null);
+  
+  // Error states for inline validation
+  const [amountError, setAmountError] = useState<string>('');
 
-  const { showToast, ToastComponent } = useToast();
+  const { showToast } = useToast();
 
   // Mock token data with balances
   const [tokenBalances, setTokenBalances] = useState<TokenBalances>({
@@ -79,13 +82,16 @@ const DexDemo = ({ onActionCompleted }: DexDemoProps) => {
   const handleSwap = (): void => {
     const amount = parseFloat(fromAmount);
     
+    // Clear previous errors
+    setAmountError('');
+    
     if (!fromAmount || amount <= 0) {
-      showToast('Please enter a valid amount', 'error');
+      setAmountError('Please enter a valid amount');
       return;
     }
 
     if (amount > tokenBalances[fromToken].balance) {
-      showToast('Insufficient balance', 'error');
+      setAmountError('Insufficient balance');
       return;
     }
 
@@ -233,7 +239,9 @@ const DexDemo = ({ onActionCompleted }: DexDemoProps) => {
 
           <div className="space-y-4">
             {/* From Token */}
-            <div className="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+            <div className={`border rounded-lg p-4 ${
+              amountError ? 'border-red-300 dark:border-red-600' : 'border-gray-200 dark:border-gray-600'
+            }`}>
               <div className="flex items-center justify-between mb-2">
                 <label className="text-sm font-medium text-gray-700 dark:text-gray-300">From</label>
                 <span className="text-sm text-gray-500 dark:text-gray-400">
@@ -248,6 +256,7 @@ const DexDemo = ({ onActionCompleted }: DexDemoProps) => {
                     const value = e.target.value;
                     if (value === '' || parseFloat(value) >= 0) {
                       setFromAmount(value);
+                      if (amountError) setAmountError('');
                     }
                   }}
                   placeholder="0.0"
@@ -264,6 +273,9 @@ const DexDemo = ({ onActionCompleted }: DexDemoProps) => {
               <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                 ≈ ${fromAmount ? (parseFloat(fromAmount) * tokenBalances[fromToken].price).toFixed(2) : '0.00'}
               </div>
+              {amountError && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{amountError}</p>
+              )}
             </div>
 
             {/* Swap Button */}
@@ -351,7 +363,6 @@ const DexDemo = ({ onActionCompleted }: DexDemoProps) => {
           isProcessing={isSwapping}
         />
 
-        <ToastComponent />
       </div>
     </div>
   );

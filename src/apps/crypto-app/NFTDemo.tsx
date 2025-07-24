@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Image, Heart, Eye, ShoppingCart, Wallet, Filter, Search } from 'lucide-react';
 import TransactionModal from './TransactionModal';
-import { useToast } from './Toast';
+import { useToast } from '../../components/Toast';
 
 interface NFTAttribute {
   trait_type: string;
@@ -45,7 +45,7 @@ const NFTDemo = () => {
   const [transactionData, setTransactionData] = useState<TransactionData | null>(null);
   const [isPurchasing, setIsPurchasing] = useState<boolean>(false);
 
-  const { showToast, ToastComponent } = useToast();
+  const { showToast } = useToast();
 
   // Mock NFT data
   const nftCollections = [
@@ -368,7 +368,6 @@ const NFTDemo = () => {
           isProcessing={isPurchasing}
         />
 
-        <ToastComponent />
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 // src/demos/WalletDemo.jsx
 import { useState } from 'react';
 import { Wallet, Send, Eye, EyeOff, Copy, Check, Plus } from 'lucide-react';
-import { useToast } from './Toast';
+import { useToast } from '../../components/Toast';
 
 interface WalletState {
   id: string;
@@ -74,8 +74,12 @@ const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
   const [showTransactionModal, setShowTransactionModal] = useState<boolean>(false);
   const [transactionData, setTransactionData] = useState<TransactionData | null>(null);
   const [copied, setCopied] = useState<string>('');
+  
+  // Error states for inline validation
+  const [amountError, setAmountError] = useState<string>('');
+  const [recipientError, setRecipientError] = useState<string>('');
 
-  const { showToast, ToastComponent } = useToast();
+  const { showToast, showSuccess } = useToast();
 
   const currentWallet = wallets.find(w => w.id === activeWalletId) || wallets[0];
   const availableRecipients = wallets.filter(w => w.id !== activeWalletId);
@@ -104,6 +108,7 @@ const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
     await navigator.clipboard.writeText(text);
     setCopied(type);
     setTimeout(() => setCopied(''), 2000);
+    showSuccess('Copied to clipboard!', '📋');
   };
 
   const calculateTransactionFee = () => {
@@ -114,34 +119,44 @@ const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
   };
 
   const prepareTransaction = () => {
+    // Clear previous errors
+    setAmountError('');
+    setRecipientError('');
+    
+    let hasErrors = false;
+    
     if (!sendAmount || parseFloat(sendAmount) <= 0) {
-      showToast('Please enter a valid amount', 'error');
-      return;
+      setAmountError('Please enter a valid amount');
+      hasErrors = true;
+    } else if (parseFloat(sendAmount) > currentWallet.balance) {
+      setAmountError('Insufficient balance');
+      hasErrors = true;
+    } else {
+      const fee = calculateTransactionFee();
+      const total = parseFloat(sendAmount) + fee;
+      if (total > currentWallet.balance) {
+        setAmountError('Insufficient balance for transaction + gas fees');
+        hasErrors = true;
+      }
     }
 
     if (!recipientWalletId) {
-      showToast('Please select a recipient wallet', 'error');
-      return;
+      setRecipientError('Please select a recipient wallet');
+      hasErrors = true;
     }
-
-    if (parseFloat(sendAmount) > currentWallet.balance) {
-      showToast('Insufficient balance', 'error');
-      return;
-    }
-
-    const fee = calculateTransactionFee();
-    const total = parseFloat(sendAmount) + fee;
-
-    if (total > currentWallet.balance) {
-      showToast('Insufficient balance for transaction + gas fees', 'error');
+    
+    if (hasErrors) {
       return;
     }
 
     const recipientWallet = wallets.find(w => w.id === recipientWalletId);
     if (!recipientWallet) {
-      showToast('Recipient wallet not found', 'error');
+      setRecipientError('Recipient wallet not found');
       return;
     }
+    
+    const fee = calculateTransactionFee();
+    const total = parseFloat(sendAmount) + fee;
     
     const txData = {
       from: currentWallet.address,
@@ -327,8 +342,13 @@ const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Recipient Wallet</label>
                     <select
                       value={recipientWalletId}
-                      onChange={(e) => setRecipientWalletId(e.target.value)}
-                      className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      onChange={(e) => {
+                        setRecipientWalletId(e.target.value);
+                        if (recipientError) setRecipientError('');
+                      }}
+                      className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${
+                        recipientError ? 'border-red-300 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'
+                      }`}
                     >
                       <option value="">Select recipient wallet...</option>
                       {availableRecipients.map((wallet) => (
@@ -337,6 +357,9 @@ const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
                         </option>
                       ))}
                     </select>
+                    {recipientError && (
+                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">{recipientError}</p>
+                    )}
                     {recipientWalletId && (
                       <div className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                         <div className="font-mono text-xs">
@@ -351,11 +374,19 @@ const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
                     <input
                       type="number"
                       value={sendAmount}
-                      onChange={(e) => setSendAmount(e.target.value)}
+                      onChange={(e) => {
+                        setSendAmount(e.target.value);
+                        if (amountError) setAmountError('');
+                      }}
                       placeholder="0.0"
                       step="0.0001"
-                      className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${
+                        amountError ? 'border-red-300 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'
+                      }`}
                     />
+                    {amountError && (
+                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">{amountError}</p>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
@@ -490,7 +521,6 @@ const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
           </div>
         )}
         
-        <ToastComponent />
       </div>
     </div>
   );
