@@ -39,7 +39,7 @@ const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
       id: Math.random().toString(36).substr(2, 9),
       name,
       address,
-      balance: Math.random() * 3 + 0.5, // Random balance between 0.5 and 3.5 ETH
+      balance: 2.5, // All wallets start with 2.5 ETH
       privateKey,
       showPrivateKey: false
     };
@@ -49,7 +49,7 @@ const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
   const [wallets, setWallets] = useState<WalletState[]>([
     {
       id: 'wallet-1',
-      name: 'Main Wallet',
+      name: 'Wallet 1',
       address: '0x742d35Cc7B4C4532CaCd8beCcBE3e5e4A78B14da3eC73ac',
       balance: 2.5,
       privateKey: '0x8da4ef21b864d2cc526dbdb2a120bd2874c36c9d0a1fb7f8c63d7f7a8b41de8f',
@@ -57,9 +57,9 @@ const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
     },
     {
       id: 'wallet-2', 
-      name: 'Secondary Wallet',
+      name: 'Wallet 2',
       address: '0x8ba1f109551bD432E27b2F90CE97F2608c6BcF04b',
-      balance: 1.8,
+      balance: 2.5,
       privateKey: '0x4c0883a69102937d6231471b5dbb6204fe5129617082792ae468d01a3f362318',
       showPrivateKey: false
     }
@@ -81,6 +81,11 @@ const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
   const availableRecipients = wallets.filter(w => w.id !== activeWalletId);
 
   const createNewWallet = () => {
+    if (wallets.length >= 8) {
+      showToast('Maximum of 8 wallets allowed', 'error');
+      return;
+    }
+    
     const walletNumber = wallets.length + 1;
     const newWallet = generateWallet(`Wallet ${walletNumber}`);
     setWallets(prev => [...prev, newWallet]);
@@ -102,7 +107,10 @@ const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
   };
 
   const calculateTransactionFee = () => {
-    return (parseFloat(gasPrice) * parseFloat(gasLimit)) / 1000000000; // Convert to ETH
+    // Gas price is in Gwei (1 Gwei = 10^9 wei)
+    // Total fee in wei = gasPrice (Gwei) * gasLimit * 10^9
+    // Convert to ETH by dividing by 10^18
+    return (parseFloat(gasPrice) * parseFloat(gasLimit)) / 1000000000; // This gives us 0.00042 ETH for 20 Gwei * 21000
   };
 
   const prepareTransaction = () => {
@@ -260,8 +268,8 @@ const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
   return (
     <div className="p-4 sm:p-6">
       <div className="max-w-7xl mx-auto">
-        {/* Wallets Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8 mb-6 sm:mb-8">
+        {/* Wallets Grid - Always 2 columns */}
+        <div className="grid grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
           {wallets.map((wallet) => (
             <WalletCard 
               key={wallet.id}
@@ -282,10 +290,11 @@ const WalletDemo = ({ onActionCompleted }: WalletDemoProps) => {
           </button>
           <button
             onClick={createNewWallet}
-            className="bg-green-600 text-white py-3 px-8 rounded-lg hover:bg-green-700 transition-colors font-medium inline-flex items-center space-x-2"
+            disabled={wallets.length >= 8}
+            className="bg-green-600 text-white py-3 px-8 rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-medium inline-flex items-center space-x-2"
           >
             <Plus className="w-5 h-5" />
-            <span>Create New Wallet</span>
+            <span>{wallets.length >= 8 ? 'Max Wallets (8)' : 'Create New Wallet'}</span>
           </button>
         </div>
 
