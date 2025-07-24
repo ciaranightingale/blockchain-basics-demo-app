@@ -208,40 +208,40 @@ function DecentralizedTab({
           </div>
 
           {/* Step-by-Step Guide */}
-          <div className="mb-8 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-300 mb-4">
-              How to Propose & Finalize a Block
+          <div className="mb-8 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border border-amber-200 dark:border-amber-700 rounded-lg p-6">
+            <h3 className="text-lg font-semibold text-amber-900 dark:text-amber-300 mb-4">
+              Try this:
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
               <div className="flex items-start space-x-3">
-                <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold">1</div>
+                <div className="w-6 h-6 bg-amber-600 text-white rounded-full flex items-center justify-center text-xs font-bold">1</div>
                 <div>
-                  <div className="font-medium text-blue-900 dark:text-blue-300">Select Transactions</div>
-                  <div className="text-blue-700 dark:text-blue-400">Choose transactions from the pending block on the right</div>
+                  <div className="font-medium text-amber-900 dark:text-amber-200">Select Transactions</div>
+                  <div className="text-amber-800 dark:text-amber-300">Choose transactions from the pending block on the right</div>
                 </div>
               </div>
               <div className="flex items-start space-x-3">
-                <div className="w-6 h-6 bg-purple-500 text-white rounded-full flex items-center justify-center text-xs font-bold">2</div>
+                <div className="w-6 h-6 bg-amber-600 text-white rounded-full flex items-center justify-center text-xs font-bold">2</div>
                 <div>
-                  <div className="font-medium text-purple-900 dark:text-purple-300">Propose Block</div>
-                  <div className="text-purple-700 dark:text-purple-400">Click "Sign & Propose Block" to submit your proposal</div>
+                  <div className="font-medium text-amber-900 dark:text-amber-200">Propose Block</div>
+                  <div className="text-amber-800 dark:text-amber-300">Click "Sign & Propose Block" to submit your proposal</div>
                 </div>
               </div>
               <div className="flex items-start space-x-3">
-                <div className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-xs font-bold">3</div>
+                <div className="w-6 h-6 bg-amber-600 text-white rounded-full flex items-center justify-center text-xs font-bold">3</div>
                 <div>
-                  <div className="font-medium text-green-900 dark:text-green-300">Validators Attest</div>
-                  <div className="text-green-700 dark:text-green-400">Scroll down to have each validator vote YES/NO</div>
+                  <div className="font-medium text-amber-900 dark:text-amber-200">Validators Attest</div>
+                  <div className="text-amber-800 dark:text-amber-300">Scroll down to have each validator attest YES/NO</div>
                 </div>
               </div>
             </div>
-            {!pendingProposal && selectedTransactions.length === 0 && (
-              <div className="mt-4 p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg border border-blue-300 dark:border-blue-600">
-                <div className="text-blue-800 dark:text-blue-300">
-                  <strong>Start here:</strong> Select transactions in the pending block (right side) to begin!
+            {/* {!pendingProposal && selectedTransactions.length === 0 && ( */}
+              <div className="mt-4 p-3 bg-amber-100 dark:bg-amber-900/30 rounded-lg border border-amber-300 dark:border-amber-600">
+                <div className="text-amber-800 dark:text-amber-300">
+                  <strong>Challenge:</strong> Can you also make 2/3 of validators malicious and then finalize a malicious block?
                 </div>
               </div>
-            )}
+            {/* )} */}
             {pendingProposal && (
               <div className="mt-4 p-3 bg-amber-100 dark:bg-amber-900/30 rounded-lg border border-amber-300 dark:border-amber-600">
                 <div className="text-amber-800 dark:text-amber-300">

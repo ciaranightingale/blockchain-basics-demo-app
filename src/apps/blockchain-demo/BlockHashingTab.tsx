@@ -47,7 +47,13 @@ function BlockHashingTab({
             <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">Block Hashing</h2>
             <p className="text-gray-600 dark:text-gray-300">See how block data is structured and hashed to create a unique fingerprint</p>
           </div>
-
+          <div className="bg-amber-50 dark:bg-amber-900 border border-amber-200 dark:border-amber-700 rounded-lg p-4 mb-6">
+            <h4 className="font-semibold text-amber-900 dark:text-amber-200 mb-2">Try this: edit the block data</h4>
+            <p className="text-sm text-amber-800 dark:text-amber-200">
+              Click on the data field in the block below and change it. Click "Calculate Hash" to see how the hash changes.
+              Try changing the block number to see how it affects the hash too.
+            </p>
+          </div>
           {/* Block Display */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border-2 border-green-400 dark:border-green-500">
             {/* Block Info */}

@@ -79,7 +79,17 @@ function BlockSigningTab({
             <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">Block Signing</h2>
             <p className="text-gray-600 dark:text-gray-300">Sign individual blocks and see how data changes affect signatures</p>
           </div>
-
+          <div className="bg-amber-50 dark:bg-amber-900 border border-amber-200 dark:border-amber-700 rounded-lg p-4 mb-6">
+            <h4 className="font-semibold text-amber-900 dark:text-amber-200 mb-2">Try this: edit the block data</h4>
+            <p className="text-sm text-amber-800 dark:text-amber-200">
+              Click on the transaction data field in the block below and change it. This will automatically change the current block hash.
+               Click "Sign Block" button to act as a validator, sign the block to lock in the current block hash.
+              </p>
+              <p className="text-sm text-amber-800 dark:text-amber-200">
+                Try changing the block data again to show how if the block data changes after signing, the hash changes and the signature becomes invalid.
+              </p>
+            
+          </div>
           {/* Block Display */}
           <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border-2 transition-colors ${
             isValid 

@@ -64,7 +64,7 @@ const BlockchainTab: React.FC<BlockchainTabProps> = ({
 
           {/* Hash Validation Explainer */}
           <div className="bg-amber-50 dark:bg-amber-900 border border-amber-200 dark:border-amber-700 rounded-lg p-4 mb-6">
-            <h4 className="font-semibold text-amber-900 dark:text-amber-200 mb-2">Try This: Edit Transaction Data</h4>
+            <h4 className="font-semibold text-amber-900 dark:text-amber-200 mb-2">Try this: edit transaction data</h4>
             <p className="text-sm text-amber-800 dark:text-amber-200">
               Click on any transaction data in the blocks below and change it. Watch how it breaks the blockchain! 
               All blocks after the changed one will turn red because their "previous hash" no longer matches.
