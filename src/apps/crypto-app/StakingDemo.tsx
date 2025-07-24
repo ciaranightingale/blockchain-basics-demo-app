@@ -505,8 +505,8 @@ const StakingDemo = ({ onActionCompleted }: StakingDemoProps) => {
                 
                 <div className="mb-6">
                   <div className="flex items-center justify-between mb-2">
-                    <label className="text-sm text-gray-500">Amount to Stake</label>
-                    <span className="text-sm text-gray-500">
+                    <label className="text-sm text-gray-500 dark:text-gray-400">Amount to Stake</label>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
                       Balance: {userBalances[selectedPool.token].toFixed(4)} {selectedPool.token}
                     </span>
                   </div>
@@ -534,9 +534,9 @@ const StakingDemo = ({ onActionCompleted }: StakingDemoProps) => {
                 </div>
 
                 {stakeAmount && (
-                  <div className="bg-gray-50 rounded-lg p-4 mb-6">
-                    <h4 className="font-medium mb-2">Projected Earnings</h4>
-                    <div className="space-y-1 text-sm">
+                  <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-6">
+                    <h4 className="font-medium mb-2 text-gray-800 dark:text-white">Projected Earnings</h4>
+                    <div className="space-y-1 text-sm text-gray-700 dark:text-gray-300">
                       <div className="flex justify-between">
                         <span>Daily:</span>
                         <span>{calculateProjectedRewards(stakeAmount, selectedPool.apy, 1)} {selectedPool.token}</span>
@@ -545,7 +545,7 @@ const StakingDemo = ({ onActionCompleted }: StakingDemoProps) => {
                         <span>Monthly:</span>
                         <span>{calculateProjectedRewards(stakeAmount, selectedPool.apy, 30)} {selectedPool.token}</span>
                       </div>
-                      <div className="flex justify-between font-medium">
+                      <div className="flex justify-between font-medium text-gray-900 dark:text-white">
                         <span>Yearly:</span>
                         <span>{calculateProjectedRewards(stakeAmount, selectedPool.apy, 365)} {selectedPool.token}</span>
                       </div>
@@ -556,7 +556,7 @@ const StakingDemo = ({ onActionCompleted }: StakingDemoProps) => {
                 <div className="flex space-x-3">
                   <button
                     onClick={() => setShowStakeModal(false)}
-                    className="flex-1 bg-gray-200 text-gray-800 py-3 px-6 rounded-lg hover:bg-gray-300 transition-colors"
+                    className="flex-1 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 py-3 px-6 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
                   >
                     Cancel
                   </button>
@@ -575,14 +575,14 @@ const StakingDemo = ({ onActionCompleted }: StakingDemoProps) => {
         {/* Unstake Modal */}
         {showUnstakeModal && selectedPool && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-xl shadow-2xl max-w-md w-full">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-md w-full border dark:border-gray-700">
               <div className="p-6">
-                <h3 className="text-xl font-bold mb-4">Unstake {selectedPool.token}</h3>
+                <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">Unstake {selectedPool.token}</h3>
                 
                 <div className="mb-6">
                   <div className="flex items-center justify-between mb-2">
-                    <label className="text-sm font-medium text-gray-700">Amount to Unstake</label>
-                    <span className="text-sm text-gray-500">
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Amount to Unstake</label>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
                       Staked: {userStakes[selectedPool.id].amount.toFixed(4)} {selectedPool.token}
                     </span>
                   </div>
@@ -604,14 +604,14 @@ const StakingDemo = ({ onActionCompleted }: StakingDemoProps) => {
                   )}
                   <button
                     onClick={() => setUnstakeAmount(userStakes[selectedPool.id].amount.toString())}
-                    className="mt-2 text-sm text-blue-600 hover:text-blue-700"
+                    className="mt-2 text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
                   >
                     Unstake All
                   </button>
                 </div>
 
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-                  <div className="flex items-center space-x-2 text-sm text-yellow-800">
+                <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg p-4 mb-6">
+                  <div className="flex items-center space-x-2 text-sm text-yellow-800 dark:text-yellow-300">
                     <Clock className="w-4 h-4" />
                     <span>Lock period: {selectedPool.lockPeriod}</span>
                   </div>
@@ -620,7 +620,7 @@ const StakingDemo = ({ onActionCompleted }: StakingDemoProps) => {
                 <div className="flex space-x-3">
                   <button
                     onClick={() => setShowUnstakeModal(false)}
-                    className="flex-1 bg-gray-200 text-gray-800 py-3 px-6 rounded-lg hover:bg-gray-300 transition-colors"
+                    className="flex-1 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 py-3 px-6 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
                   >
                     Cancel
                   </button>
