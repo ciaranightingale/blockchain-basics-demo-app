@@ -35,7 +35,7 @@ function App() {
           ECDSA Signature Demo
         </h1>
         <p className="text-center text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
-          Learn about Elliptic Curve Digital Signature Algorithm (ECDSA) through interactive demonstrations. 
+          Learn about the <a href="https://www.cyfrin.io/blog/elliptic-curve-digital-signature-algorithm-and-signatures" className="text-blue-600">Elliptic Curve Digital Signature Algorithm (ECDSA)</a> through interactive demonstrations. 
           Generate keys, create signatures, and verify them step by step.
         </p>
 
@@ -69,15 +69,15 @@ function App() {
           <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">About ECDSA</h2>
           <div className="grid md:grid-cols-2 gap-6 text-sm text-gray-600 dark:text-gray-300">
             <div>
-              <h3 className="font-semibold text-blue-600 dark:text-blue-400 mb-2">What is ECDSA?</h3>
+              <h3 className="font-semibold dark:text-blue-white mb-2">What is ECDSA?</h3>
               <p>
-                ECDSA (Elliptic Curve Digital Signature Algorithm) is a cryptographic algorithm 
+                <a href="https://www.cyfrin.io/blog/elliptic-curve-digital-signature-algorithm-and-signatures" className='text-blue-600'>ECDSA (Elliptic Curve Digital Signature Algorithm)</a> is a cryptographic algorithm 
                 used to create digital signatures. It's based on elliptic curve mathematics and 
                 provides the same security as RSA with smaller key sizes.
               </p>
             </div>
             <div>
-              <h3 className="font-semibold text-blue-600 dark:text-blue-400 mb-2">How it works:</h3>
+              <h3 className="font-semibold dark:text-blue-white mb-2">How it works:</h3>
               <ul className="list-disc list-inside space-y-1">
                 <li>Private key: Random 256-bit number</li>
                 <li>Public key: Derived from private key using elliptic curve multiplication</li>
