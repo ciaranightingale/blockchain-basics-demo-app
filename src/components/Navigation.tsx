@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Blocks, Coins, Key, Menu, X, AlertCircle } from 'lucide-react';
+import { Home, Blocks, Coins, Key, Menu, X, AlertCircle, Book } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 import { useTheme } from '../contexts/ThemeContext';
 import { useState } from 'react';
@@ -15,6 +15,7 @@ const Navigation = () => {
     { path: '/blockchain', label: 'Blockchain Demo', icon: Blocks },
     { path: '/crypto', label: 'Crypto Demo', icon: Coins },
     { path: '/ecdsa', label: 'ECDSA Signatures', icon: Key },
+    { path: 'https://updraft.cyfrin.io/', label: 'Cyfrin Updraft', icon: Book, external: true },
   ];
 
   return (
@@ -28,7 +29,7 @@ const Navigation = () => {
               className="w-8 h-8 object-contain"
             />
             <span className="text-xl font-bold text-gray-800 dark:text-white hidden sm:block">
-              Blockchain Learning Hub
+              Updraft Learning Hub
             </span>
             <span className="text-lg font-bold text-gray-800 dark:text-white sm:hidden">
               BLH
@@ -38,20 +39,25 @@ const Navigation = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
             <div className="flex space-x-4">
-              {navItems.map(({ path, label, icon: Icon }) => (
-              <Link
-                key={path}
-                to={path}
-                className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                  location.pathname === path
-                    ? 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700'
-                }`}
-              >
-                <Icon size={16} />
-                <span className="hidden lg:block">{label}</span>
-              </Link>
-              ))}
+              {navItems.map(({ path, label, icon: Icon, external }) => {
+                const linkProps = external ? { href: path, target: '_blank', rel: 'noopener noreferrer' } : { to: path };
+                const LinkComponent = external ? 'a' : Link;
+                
+                return (
+                <LinkComponent
+                  key={path}
+                  {...linkProps}
+                  className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                    !external && location.pathname === path
+                      ? 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700'
+                  }`}
+                >
+                  <Icon size={16} />
+                  <span className="hidden lg:block">{label}</span>
+                </LinkComponent>
+                );
+              })}
             </div>
             <ThemeToggle />
           </div>
@@ -72,21 +78,26 @@ const Navigation = () => {
         {isMobileMenuOpen && (
           <div className="md:hidden border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
             <div className="px-4 py-3 space-y-1">
-              {navItems.map(({ path, label, icon: Icon }) => (
-                <Link
+              {navItems.map(({ path, label, icon: Icon, external }) => {
+                const linkProps = external ? { href: path, target: '_blank', rel: 'noopener noreferrer' } : { to: path };
+                const LinkComponent = external ? 'a' : Link;
+                
+                return (
+                <LinkComponent
                   key={path}
-                  to={path}
+                  {...linkProps}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={`flex items-center space-x-3 px-3 py-3 rounded-lg text-base font-medium transition-all ${
-                    location.pathname === path
+                    !external && location.pathname === path
                       ? 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300'
                       : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700'
                   }`}
                 >
                   <Icon size={20} />
                   <span>{label}</span>
-                </Link>
-              ))}
+                </LinkComponent>
+                );
+              })}
             </div>
           </div>
         )}

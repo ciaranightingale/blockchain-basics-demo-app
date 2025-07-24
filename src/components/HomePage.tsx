@@ -37,7 +37,7 @@ const HomePage = () => {
     <div className="min-h-screen">
       <div className="container mx-auto px-4 py-6 sm:py-8">
         <h1 className="text-3xl sm:text-4xl font-bold text-center mb-2 text-gray-800 dark:text-white">
-          Blockchain Learning Hub
+          Updraft Learning Hub
         </h1>
         <p className="text-center text-gray-600 dark:text-gray-300 mb-6 sm:mb-8 text-sm sm:text-base max-w-3xl mx-auto">
           Interactive demonstrations to learn blockchain technology, cryptography, and decentralized finance
