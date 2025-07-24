@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useToast } from './Toast';
 
 // Type definitions
@@ -38,20 +38,47 @@ const BlockchainTab: React.FC<BlockchainTabProps> = ({
 }) => {
   // Get toast functions from context
   const { showError } = useToast();
+  
+  // Refs to track cursor positions for each textarea
+  const textareaRefs = useRef<{ [key: number]: HTMLTextAreaElement | null }>({});
+  const cursorPositions = useRef<{ [key: number]: number }>({});
 
-  // Enhanced handler with toast notifications for blockchain changes
+  // Enhanced handler with cursor position preservation
   const handleDataChange = (blockIndex: number, newData: string): void => {
     if (!handleBlockchainDataChange) {
       showError('Blockchain data change handler not available', '❌ Error');
       return;
     }
 
-    // Store original data to compare
-    // const originalData = blockchain[blockIndex]?.data;
+    // Store cursor position before state change
+    const textarea = textareaRefs.current[blockIndex];
+    if (textarea) {
+      cursorPositions.current[blockIndex] = textarea.selectionStart;
+    }
     
     // Call the parent handler
     handleBlockchainDataChange(blockIndex, newData);
   };
+
+  // Restore cursor position after re-render
+  useEffect(() => {
+    Object.keys(cursorPositions.current).forEach(key => {
+      const blockIndex = parseInt(key);
+      const textarea = textareaRefs.current[blockIndex];
+      const cursorPos = cursorPositions.current[blockIndex];
+      
+      if (textarea && cursorPos !== undefined) {
+        // Small delay to ensure DOM has updated
+        setTimeout(() => {
+          textarea.focus();
+          textarea.setSelectionRange(cursorPos, cursorPos);
+        }, 0);
+        
+        // Clear the stored position
+        delete cursorPositions.current[blockIndex];
+      }
+    });
+  }, [blockchain]); // Re-run when blockchain state changes
 
   return (
     <>
@@ -137,6 +164,7 @@ const BlockchainTab: React.FC<BlockchainTabProps> = ({
                             Transactions (try editing!):
                           </label>
                           <textarea
+                            ref={(el) => { textareaRefs.current[index] = el; }}
                             value={block.data}
                             onChange={(e) => handleDataChange(index, e.target.value)}
                             className={`w-full h-20 p-2 border rounded text-xs font-mono resize-none transition-colors ${
