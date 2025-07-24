@@ -178,9 +178,14 @@ const WhyBlockchainApp: React.FC = () => {
       setShowFailureModal(true);
       
       // Mark challenge as completed (attempted)
-      setChallengeStates(prev => 
-        prev.map(c => c.id === challenge.id ? { ...c, completed: true } : c)
-      );
+      setChallengeStates(prev => {
+        const updatedStates = prev.map(c => c.id === challenge.id ? { ...c, completed: true } : c);
+        
+        // No need to do anything special - completion screen will show automatically
+        // when completedChallenges === totalChallenges
+        
+        return updatedStates;
+      });
     }, 2000);
   };
 
@@ -298,201 +303,277 @@ const WhyBlockchainApp: React.FC = () => {
           </div>
         </div>
 
-        {/* Current Challenge */}
-        <div className="max-w-2xl mx-auto">
-          <div 
-            className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden"
-          >
-            {/* Challenge Header */}
-            <div className={`${getColorForChallenge(currentChallengeIndex)} p-4 text-white`}>
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold">{currentChallenge.title}</h3>
-                {currentChallenge.completed && (
-                  <CheckCircle size={20} className="text-white" />
-                )}
-              </div>
-            </div>
-
-            {/* Challenge Content */}
-            <div className="p-6">
-              <p className="text-gray-600 dark:text-gray-300 mb-4">
-                {currentChallenge.description}
-              </p>
-
-              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-4">
-                <p className="text-sm text-gray-700 dark:text-gray-300 italic">
-                  {currentChallenge.scenario}
-                </p>
-              </div>
-
-              {/* Recipient Info */}
-              <div className="flex items-center space-x-3 mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                <span className="text-2xl">{getIconForType(currentChallenge.recipient.type)}</span>
-                <div>
-                  <p className="font-medium text-gray-900 dark:text-white">
-                    {currentChallenge.recipient.name}
-                  </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {currentChallenge.recipient.location}
-                  </p>
-                </div>
-              </div>
-
-              {/* Amount and Action */}
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center space-x-2">
-                  <DollarSign size={20} className="text-green-600" />
-                  <span className="text-xl font-bold text-gray-900 dark:text-white">
-                    {currentChallenge.amount}
-                  </span>
-                </div>
-                
-                <button
-                  onClick={() => handleAttemptTransfer(currentChallenge)}
-                  disabled={processingChallenges.has(currentChallenge.id) || currentChallenge.completed}
-                  className={`px-6 py-2 rounded-lg font-medium transition-all ${
-                    currentChallenge.completed
-                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                      : processingChallenges.has(currentChallenge.id)
-                      ? 'bg-gray-400 text-white cursor-not-allowed'
-                      : 'bg-blue-600 hover:bg-blue-700 text-white'
-                  }`}
-                >
-                  {currentChallenge.completed 
-                    ? 'Attempted' 
-                    : processingChallenges.has(currentChallenge.id)
-                    ? 'Processing...' 
-                    : currentChallenge.id === 7 ? 'Withdraw Money' : 'Send Money'
-                  }
-                </button>
-              </div>
-
-              {/* Navigation */}
-              <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-600">
-                <button
-                  onClick={handlePrevChallenge}
-                  disabled={currentChallengeIndex === 0}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all ${
-                    currentChallengeIndex === 0
-                      ? 'bg-gray-200 text-gray-400 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
-                  }`}
-                >
-                  <ChevronLeft size={16} />
-                  <span>Previous</span>
-                </button>
-
-                <div className="flex space-x-2">
-                  {challengeStates.map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setCurrentChallengeIndex(index)}
-                      className={`w-3 h-3 rounded-full transition-all ${
-                        index === currentChallengeIndex
-                          ? 'bg-blue-600'
-                          : challengeStates[index].completed
-                          ? 'bg-green-500'
-                          : 'bg-gray-300 dark:bg-gray-600'
-                      }`}
-                    />
-                  ))}
-                </div>
-
-                <button
-                  onClick={handleNextChallenge}
-                  disabled={currentChallengeIndex === challengeStates.length - 1 || !currentChallenge.completed}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all ${
-                    currentChallengeIndex === challengeStates.length - 1 || !currentChallenge.completed
-                      ? 'bg-gray-200 text-gray-400 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500'
-                      : 'bg-blue-600 hover:bg-blue-700 text-white'
-                  }`}
-                >
-                  <span>Next</span>
-                  <ChevronRight size={16} />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Completion Message */}
-        {completedChallenges === totalChallenges && (
-          <div className="max-w-2xl mx-auto mt-8 p-6 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200 dark:border-green-800">
-            <div className="text-center">
-              <CheckCircle size={48} className="text-green-600 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-green-900 dark:text-green-100 mb-2">
-                All Challenges Attempted!
+        {/* Show completion page if all challenges are completed */}
+        {completedChallenges === totalChallenges ? (
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center py-16">
+              <CheckCircle size={80} className="text-green-600 mx-auto mb-8" />
+              <h2 className="text-4xl font-bold text-green-900 dark:text-green-100 mb-6">
+                Congratulations! 🎉
+              </h2>
+              <h3 className="text-2xl font-semibold text-gray-800 dark:text-white mb-4">
+                All Challenges Completed!
               </h3>
-              <p className="text-green-700 dark:text-green-300">
-                You've experienced the limitations of traditional financial systems. 
+              <p className="text-lg text-gray-600 dark:text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed">
+                You've experienced the limitations of traditional financial systems first-hand. 
                 Blockchain technology solves these problems by enabling peer-to-peer transactions 
                 without geographic restrictions, banking hours, or centralized control.
               </p>
+              
+              {/* Key Benefits Summary */}
+              {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-xl border border-blue-200 dark:border-blue-700">
+                  <div className="text-3xl mb-3">🌍</div>
+                  <h4 className="font-semibold text-blue-900 dark:text-blue-300 mb-2">Global Access</h4>
+                  <p className="text-sm text-blue-700 dark:text-blue-400">Send money anywhere, anytime, without restrictions</p>
+                </div>
+                <div className="bg-green-50 dark:bg-green-900/20 p-6 rounded-xl border border-green-200 dark:border-green-700">
+                  <div className="text-3xl mb-3">⏰</div>
+                  <h4 className="font-semibold text-green-900 dark:text-green-300 mb-2">24/7 Availability</h4>
+                  <p className="text-sm text-green-700 dark:text-green-400">No banking hours - transactions work around the clock</p>
+                </div>
+                <div className="bg-purple-50 dark:bg-purple-900/20 p-6 rounded-xl border border-purple-200 dark:border-purple-700">
+                  <div className="text-3xl mb-3">🔒</div>
+                  <h4 className="font-semibold text-purple-900 dark:text-purple-300 mb-2">Self Custody</h4>
+                  <p className="text-sm text-purple-700 dark:text-purple-400">You control your money without intermediaries</p>
+                </div>
+                <div className="bg-orange-50 dark:bg-orange-900/20 p-6 rounded-xl border border-orange-200 dark:border-orange-700">
+                  <div className="text-3xl mb-3">🤝</div>
+                  <h4 className="font-semibold text-orange-900 dark:text-orange-300 mb-2">Trustless</h4>
+                  <p className="text-sm text-orange-700 dark:text-orange-400">Smart contracts eliminate the need for trusted third parties</p>
+                </div>
+              </div> */}
+              
+              {/* Challenge Summary */}
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-8 mb-12">
+                <h4 className="text-xl font-semibold text-gray-800 dark:text-white mb-6">Challenges You Overcame:</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+                  {challengeStates.map((challenge) => (
+                    <div key={challenge.id} className="flex items-start space-x-3">
+                      <CheckCircle size={20} className="text-green-600 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <div className="font-medium text-gray-800 dark:text-white">{challenge.title}</div>
+                        <div className="text-sm text-gray-600 dark:text-gray-400">{challenge.failureReason}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+
+              {/* Next Steps */}
+              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-8">
+                <h4 className="text-xl font-semibold text-blue-900 dark:text-blue-300 mb-4">Ready to Learn More?</h4>
+                <p className="text-blue-700 dark:text-blue-400 mb-6">
+                  Explore our other demos to dive deeper into blockchain technology:
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Link
+                    to="https://updraft.cyfrin.io/"
+                    className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors font-medium w-full"
+                  >
+                    Updraft
+                  </Link>
+                  <Link 
+                    to="/blockchain" 
+                    className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium w-full"
+                  >
+                    Blockchain Demo
+                  </Link>
+                  <Link 
+                    to="/crypto" 
+                    className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium w-full"
+                  >
+                    Crypto Demo
+                  </Link>
+                  <Link 
+                    to="/ecdsa" 
+                    className="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors font-medium w-full"
+                  >
+                    Signatures Demo
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          /* Current Challenge */
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+              {/* Challenge Header */}
+              <div className={`${getColorForChallenge(currentChallengeIndex)} p-4 text-white`}>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold">{currentChallenge.title}</h3>
+                  {currentChallenge.completed && (
+                    <CheckCircle size={20} className="text-white" />
+                  )}
+                </div>
+              </div>
+
+              {/* Challenge Content */}
+              <div className="p-6">
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  {currentChallenge.description}
+                </p>
+
+                <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-4">
+                  <p className="text-sm text-gray-700 dark:text-gray-300 italic">
+                    {currentChallenge.scenario}
+                  </p>
+                </div>
+
+                {/* Recipient Info */}
+                <div className="flex items-center space-x-3 mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                  <span className="text-2xl">{getIconForType(currentChallenge.recipient.type)}</span>
+                  <div>
+                    <p className="font-medium text-gray-900 dark:text-white">
+                      {currentChallenge.recipient.name}
+                    </p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {currentChallenge.recipient.location}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Amount and Action */}
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center space-x-2">
+                    <DollarSign size={20} className="text-green-600" />
+                    <span className="text-xl font-bold text-gray-900 dark:text-white">
+                      {currentChallenge.amount}
+                    </span>
+                  </div>
+                  
+                  <button
+                    onClick={() => handleAttemptTransfer(currentChallenge)}
+                    disabled={processingChallenges.has(currentChallenge.id) || currentChallenge.completed}
+                    className={`px-6 py-2 rounded-lg font-medium transition-all ${
+                      currentChallenge.completed
+                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        : processingChallenges.has(currentChallenge.id)
+                        ? 'bg-gray-400 text-white cursor-not-allowed'
+                        : 'bg-blue-600 hover:bg-blue-700 text-white'
+                    }`}
+                  >
+                    {currentChallenge.completed 
+                      ? 'Attempted' 
+                      : processingChallenges.has(currentChallenge.id)
+                      ? 'Processing...' 
+                      : currentChallenge.id === 7 ? 'Withdraw Money' : 'Send Money'
+                    }
+                  </button>
+                </div>
+
+                {/* Navigation */}
+                <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-600">
+                  <button
+                    onClick={handlePrevChallenge}
+                    disabled={currentChallengeIndex === 0}
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                      currentChallengeIndex === 0
+                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                    }`}
+                  >
+                    <ChevronLeft size={16} />
+                    <span>Previous</span>
+                  </button>
+
+                  <div className="flex space-x-2">
+                    {challengeStates.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setCurrentChallengeIndex(index)}
+                        className={`w-3 h-3 rounded-full transition-all ${
+                          index === currentChallengeIndex
+                            ? 'bg-blue-600'
+                            : challengeStates[index].completed
+                            ? 'bg-green-500'
+                            : 'bg-gray-300 dark:bg-gray-600'
+                        }`}
+                      />
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={handleNextChallenge}
+                    disabled={currentChallengeIndex === challengeStates.length - 1 || !currentChallenge.completed}
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                      currentChallengeIndex === challengeStates.length - 1 || !currentChallenge.completed
+                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500'
+                        : 'bg-blue-600 hover:bg-blue-700 text-white'
+                    }`}
+                  >
+                    <span>Next</span>
+                    <ChevronRight size={16} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Failure Modal */}
+        {showFailureModal && selectedChallenge && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-2">
+                  <Lock size={24} className="text-red-600" />
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    Transaction Failed
+                  </h3>
+                </div>
+                <button
+                  onClick={() => setShowFailureModal(false)}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="mb-4">
+                <div className="flex items-center space-x-2 mb-2">
+                  <AlertCircle size={16} className="text-red-600" />
+                  <span className="font-medium text-red-600">
+                    {selectedChallenge.failureReason}
+                  </span>
+                </div>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">
+                  {renderMessageWithLinks(selectedChallenge.failureMessage)}
+                </p>
+              </div>
+
+              <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                <p className="text-sm text-blue-800 dark:text-blue-200">
+                  💡 <strong>With Blockchain:</strong> {
+                    selectedChallenge.id <= 3 
+                      ? "This transaction would be completed in minutes, 24/7, without geographic restrictions or intermediary approval."
+                      : selectedChallenge.id === 4
+                      ? "This payment would be completed instantly, outside banking hours, enabling global freelancer payments 24/7."
+                      : selectedChallenge.id === 5
+                      ? "Smart contracts enable trustless escrow - funds are automatically released when both parties fulfill conditions, with no fees or delays."
+                      : selectedChallenge.id === 6
+                      ? "Smart contracts automatically execute payouts when conditions are met (flight delay data from oracles), eliminating manual reviews and reducing claim denial rates to near zero."
+                      : selectedChallenge.id === 7
+                      ? "You control your own money without government withdrawal limits or banking restrictions. Your funds, your choice."
+                      : selectedChallenge.id === 8
+                      ? "Anonymous donations protect political donors from government surveillance and retaliation. Democracy thrives with financial privacy."
+                      : "Blockchain enables financial freedom without intermediary control or government restrictions."
+                  }
+                </p>
+              </div>
+
+              <button
+                onClick={() => setShowFailureModal(false)}
+                className="w-full mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+              >
+                Continue Learning
+              </button>
             </div>
           </div>
         )}
       </div>
-
-      {/* Failure Modal */}
-      {showFailureModal && selectedChallenge && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center space-x-2">
-                <Lock size={24} className="text-red-600" />
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  Transaction Failed
-                </h3>
-              </div>
-              <button
-                onClick={() => setShowFailureModal(false)}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="mb-4">
-              <div className="flex items-center space-x-2 mb-2">
-                <AlertCircle size={16} className="text-red-600" />
-                <span className="font-medium text-red-600">
-                  {selectedChallenge.failureReason}
-                </span>
-              </div>
-              <p className="text-gray-600 dark:text-gray-300 text-sm">
-                {renderMessageWithLinks(selectedChallenge.failureMessage)}
-              </p>
-            </div>
-
-            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-              <p className="text-sm text-blue-800 dark:text-blue-200">
-                💡 <strong>With Blockchain:</strong> {
-                  selectedChallenge.id <= 3 
-                    ? "This transaction would be completed in minutes, 24/7, without geographic restrictions or intermediary approval."
-                    : selectedChallenge.id === 4
-                    ? "This payment would be completed instantly, outside banking hours, enabling global freelancer payments 24/7."
-                    : selectedChallenge.id === 5
-                    ? "Smart contracts enable trustless escrow - funds are automatically released when both parties fulfill conditions, with no fees or delays."
-                    : selectedChallenge.id === 6
-                    ? "Smart contracts automatically execute payouts when conditions are met (flight delay data from oracles), eliminating manual reviews and reducing claim denial rates to near zero."
-                    : selectedChallenge.id === 7
-                    ? "You control your own money without government withdrawal limits or banking restrictions. Your funds, your choice."
-                    : selectedChallenge.id === 8
-                    ? "Anonymous donations protect political donors from government surveillance and retaliation. Democracy thrives with financial privacy."
-                    : "Blockchain enables financial freedom without intermediary control or government restrictions."
-                }
-              </p>
-            </div>
-
-            <button
-              onClick={() => setShowFailureModal(false)}
-              className="w-full mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-            >
-              Continue Learning
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

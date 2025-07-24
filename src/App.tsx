@@ -30,9 +30,9 @@ function AppContent() {
           title: "ECDSA Signature Demo",
           description: "Educational tool for understanding elliptic curve digital signatures"
         };
-      case '/blockchain-basics':
+      case '/why-blockchain':
         return {
-          title: "Blockchain Basics Challenges",
+          title: "Why Blockchain Challenges",
           description: "Experience real-world problems with traditional finance that blockchain solves"
         };
       default:
@@ -52,7 +52,7 @@ function AppContent() {
           <Route path="/blockchain" element={<BlockchainApp />} />
           <Route path="/crypto" element={<CryptoApp />} />
           <Route path="/ecdsa" element={<EcdsaApp />} />
-          <Route path="/blockchain-basics" element={<BlockchainBasicsApp />} />
+          <Route path="/why-blockchain" element={<BlockchainBasicsApp />} />
         </Routes>
       </main>
       {location.pathname !== '/crypto' && <Footer {...getFooterProps()} />}

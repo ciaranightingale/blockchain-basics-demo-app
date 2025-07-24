@@ -6,7 +6,7 @@ const HomePage = () => {
     {
       title: 'Why Blockchain',
       description: 'Experience real-world problems with traditional finance that blockchain solves.',
-      path: '/blockchain-basics',
+      path: '/why-blockchain',
       icon: AlertCircle,
       color: 'bg-red-500',
     },
