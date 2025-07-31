@@ -15,31 +15,11 @@ function AppContent() {
     switch (location.pathname) {
       case '/blockchain':
         return {
-          title: "Ethereum Proof of Stake Demo",
-          description: "Educational tool for understanding Ethereum's PoS consensus mechanism",
           inspirationUrl: "https://andersbrownworth.com/blockchain/",
           inspirationText: "Inspired by Anders Brownworth's Blockchain Demo"
         };
-      case '/crypto':
-        return {
-          title: "Crypto Wallet Demo",
-          description: "Educational tool for understanding cryptocurrency wallets and transactions"
-        };
-      case '/ecdsa':
-        return {
-          title: "ECDSA Signature Demo",
-          description: "Educational tool for understanding elliptic curve digital signatures"
-        };
-      case '/why-blockchain':
-        return {
-          title: "Why Blockchain Challenges",
-          description: "Experience real-world problems with traditional finance that blockchain solves"
-        };
       default:
-        return {
-          title: "Blockchain Basics Demo",
-          description: "Interactive educational tools for understanding blockchain technology"
-        };
+        return {};
     }
   };
 
