@@ -205,8 +205,16 @@ const EthereumPoSDemo = () => {
   
   // Utility function to calculate Keccak-256 hash (Ethereum standard)
   const calculateHash = async (input: string) => {
-    // Use ethers.js keccak256 - the proper Ethereum implementation
-    return keccak256(toUtf8Bytes(input));
+    // Check if input looks like hex data (starts with 0x and contains only hex chars)
+    const isHexData = /^0x[0-9a-fA-F]+$/.test(input);
+    
+    if (isHexData) {
+      // For hex data, hash the actual bytes (like public keys, addresses, etc.)
+      return keccak256(input);
+    } else {
+      // For regular text, hash the UTF-8 bytes
+      return keccak256(toUtf8Bytes(input));
+    }
   };
   
   // Utility function to calculate block hash (PoS style)

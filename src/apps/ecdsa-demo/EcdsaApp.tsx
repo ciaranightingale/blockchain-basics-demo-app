@@ -1,31 +1,64 @@
 import { useState } from 'react';
-import PrivateKeyGenerator from './PrivateKeyGenerator';
+import SeedPhraseGenerator from './SeedPhraseGenerator';
+import MultiplePrivateKeys from './MultiplePrivateKeys';
 import PublicKeyDerivation from './PublicKeyDerivation';
 import AddressGenerator from './AddressGenerator';
 import MessageSigner from './MessageSigner';
 import SignatureVerifier from './SignatureVerifier';
 
+interface PrivateKey {
+  id: string;
+  index: number;
+  key: string;
+  derivationPath: string;
+}
+
 interface PublicKey {
   id: string;
   key: string;
   compressed: boolean;
+  privateKeyId: string;
+}
+
+interface Address {
+  id: string;
+  address: string;
+  sourceKeyId: string;
 }
 
 function App() {
-  const [privateKey, setPrivateKey] = useState<string>('');
+  const [seedPhrase, setSeedPhrase] = useState<string>('');
+  const [privateKeys, setPrivateKeys] = useState<PrivateKey[]>([]);
   const [publicKeys, setPublicKeys] = useState<PublicKey[]>([]);
+  const [addresses, setAddresses] = useState<Address[]>([]);
 
-  const handlePrivateKeyGenerated = (key: string) => {
-    setPrivateKey(key);
+  const handleSeedPhraseGenerated = (phrase: string) => {
+    setSeedPhrase(phrase);
+    // Reset everything when a new seed phrase is generated
+    setPrivateKeys([]);
+    setPublicKeys([]);
+    setAddresses([]);
+  };
+
+  const handlePrivateKeysChange = (keys: PrivateKey[]) => {
+    setPrivateKeys(keys);
+    // Reset public keys when private keys change (new accounts added/removed)
+    setPublicKeys(publicKeys.filter(pk => keys.some(privKey => privKey.id === pk.privateKeyId)));
   };
 
   const handlePublicKeysChange = (keys: PublicKey[]) => {
     setPublicKeys(keys);
   };
 
+  const handleAddressesChange = (newAddresses: Address[]) => {
+    setAddresses(newAddresses);
+  };
+
   const resetAll = () => {
-    setPrivateKey('');
+    setSeedPhrase('');
+    setPrivateKeys([]);
     setPublicKeys([]);
+    setAddresses([]);
   };
 
   return (
@@ -36,25 +69,33 @@ function App() {
         </h1>
         <p className="text-center text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
           Learn about the <a href="https://www.cyfrin.io/blog/elliptic-curve-digital-signature-algorithm-and-signatures" className="text-blue-600">Elliptic Curve Digital Signature Algorithm (ECDSA)</a> through interactive demonstrations. 
-          Generate keys, create signatures, and verify them step by step.
+          Generate seed phrases, derive multiple private keys, create signatures, and verify them step by step!
         </p>
 
         <div className="space-y-8">
-          <PrivateKeyGenerator onPrivateKeyGenerated={handlePrivateKeyGenerated} />
+          <SeedPhraseGenerator onSeedPhraseGenerated={handleSeedPhraseGenerated} />
+          
+          <MultiplePrivateKeys 
+            seedPhrase={seedPhrase}
+            onPrivateKeysChange={handlePrivateKeysChange}
+          />
           
           <PublicKeyDerivation 
-            privateKey={privateKey} 
+            privateKeys={privateKeys} 
             onPublicKeysChange={handlePublicKeysChange}
           />
           
-          <AddressGenerator publicKeys={publicKeys} />
+          <AddressGenerator 
+            publicKeys={publicKeys} 
+            onAddressesChange={handleAddressesChange}
+          />
           
-          <MessageSigner privateKey={privateKey} />
+          <MessageSigner privateKeys={privateKeys} />
           
-          <SignatureVerifier publicKeys={publicKeys} />
+          <SignatureVerifier addresses={addresses} />
         </div>
 
-        {(privateKey || publicKeys.length > 0) && (
+        {(seedPhrase || privateKeys.length > 0 || publicKeys.length > 0) && (
           <div className="mt-12 text-center">
             <button
               onClick={resetAll}
@@ -79,10 +120,11 @@ function App() {
             <div>
               <h3 className="font-semibold dark:text-blue-white mb-2">How it works:</h3>
               <ul className="list-disc list-inside space-y-1">
-                <li>Private key: Random 256-bit number</li>
-                <li>Public key: Derived from private key using elliptic curve multiplication</li>
-                <li>Signature: Mathematical proof that you own the private key</li>
-                <li>Verification: Anyone can verify the signature using the public key</li>
+                <li>Seed phrase: 12 random words that generate all your keys</li>
+                <li>Private keys: Derived from seed phrase using BIP44 standard</li>
+                <li>Public keys: Derived from private keys using elliptic curve multiplication</li>
+                <li>Signatures: Mathematical proof that you own the private key</li>
+                <li>Verification: Anyone can verify signatures using the public key</li>
               </ul>
             </div>
           </div>

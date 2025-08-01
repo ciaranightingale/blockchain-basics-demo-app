@@ -1,23 +1,32 @@
 import { useState } from 'react';
-import { verifySignature } from '../../utils/crypto';
+import { verifySignatureWithAddress } from '../../utils/crypto';
 
-interface SignatureVerifierProps {
-  publicKeys: { id: string; key: string; compressed: boolean }[];
+interface Address {
+  id: string;
+  address: string;
+  sourceKeyId: string;
 }
 
-export default function SignatureVerifier({ publicKeys }: SignatureVerifierProps) {
+interface SignatureVerifierProps {
+  addresses: Address[];
+}
+
+export default function SignatureVerifier({ addresses }: SignatureVerifierProps) {
+  const [selectedAddressId, setSelectedAddressId] = useState('');
   const [message, setMessage] = useState('');
   const [signature, setSignature] = useState('');
   const [verificationResult, setVerificationResult] = useState<boolean | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
 
   const handleVerify = async () => {
-    const publicKey = publicKeys[0]?.key;
-    if (!message || !signature || !publicKey) return;
+    if (!message || !signature || !selectedAddressId) return;
+    
+    const selectedAddress = addresses.find(addr => addr.id === selectedAddressId);
+    if (!selectedAddress) return;
     
     setIsVerifying(true);
     try {
-      const result = verifySignature(message, signature, publicKey);
+      const result = verifySignatureWithAddress(message, signature, selectedAddress.address);
       setVerificationResult(result);
     } catch (error) {
       console.error('Verification failed:', error);
@@ -28,6 +37,7 @@ export default function SignatureVerifier({ publicKeys }: SignatureVerifierProps
   };
 
   const resetVerification = () => {
+    setSelectedAddressId('');
     setMessage('');
     setSignature('');
     setVerificationResult(null);
@@ -36,26 +46,55 @@ export default function SignatureVerifier({ publicKeys }: SignatureVerifierProps
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 border border-gray-200 dark:border-gray-700">
-      <div className="flex items-center gap-4 mb-8">
-        <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0">
-          <span className="text-white font-bold text-lg">5</span>
-        </div>
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Verify Signature</h2>
-      </div>
+      <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
+        6. Verify Signatures
+      </h2>
 
-      {publicKeys.length === 0 ? (
-        <div className="text-center py-8 text-gray-600 dark:text-gray-300">
-          <p>Generate a public key first to verify signatures</p>
+      {addresses.length === 0 ? (
+        <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-6 border border-gray-200 dark:border-gray-600">
+          <p className="text-gray-600 dark:text-gray-400 text-center">
+            Generate addresses first to verify signatures
+          </p>
         </div>
       ) : (
         <div className="space-y-6">
           <div className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-            <p>Verify signatures using the original message and public key:</p>
+            <p>Verify signatures using the original message and Ethereum address:</p>
             <ul className="list-disc list-inside mt-2 space-y-1">
+              <li>Select which account's address to verify against</li>
               <li>Enter the exact message that was signed</li>
               <li>Provide the signature to verify</li>
-              <li>Select the corresponding public key</li>
+              <li>The verification will recover the address from the signature and compare</li>
             </ul>
+          </div>
+
+          <div className="space-y-3 mb-6">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Select Address for Verification:
+            </label>
+            <select
+              value={selectedAddressId}
+              onChange={(e) => setSelectedAddressId(e.target.value)}
+              className="w-full p-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent text-gray-700 dark:text-white"
+            >
+              <option value="">Select an address...</option>
+              {addresses.map((address) => {
+                const accountIndex = address.sourceKeyId.replace('public-key-', '');
+                return (
+                  <option key={address.id} value={address.id}>
+                    Account {accountIndex} ({address.address.slice(0, 6)}...{address.address.slice(-4)})
+                  </option>
+                );
+              })}
+            </select>
+            {selectedAddressId && (
+              <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600">
+                <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Selected Address:</div>
+                <div className="font-mono text-sm break-all text-gray-700 dark:text-gray-300">
+                  {addresses.find(addr => addr.id === selectedAddressId)?.address}
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="space-y-4">
@@ -84,27 +123,11 @@ export default function SignatureVerifier({ publicKeys }: SignatureVerifierProps
           />
         </div>
 
-        <div className="space-y-4">
-          <label className="block text-sm font-medium text-blue-600 dark:text-blue-400">
-            Public Key for Verification:
-          </label>
-          {publicKeys.length > 0 ? (
-            <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
-              <div className="font-mono text-sm break-all text-gray-700 dark:text-gray-300">
-                {publicKeys[0].key}
-              </div>
-            </div>
-          ) : (
-            <div className="text-gray-600 dark:text-gray-300 text-sm bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-              No public key available. Generate a public key first.
-            </div>
-          )}
-        </div>
 
         <div className="flex gap-2">
           <button
             onClick={handleVerify}
-            disabled={!message || !signature || publicKeys.length === 0 || isVerifying}
+            disabled={!message || !signature || !selectedAddressId || isVerifying}
             className="flex-1 bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-md transition-colors duration-200 border border-blue-500 hover:border-blue-600 dark:border-blue-600 dark:hover:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-500 disabled:hover:border-blue-500 dark:disabled:hover:bg-blue-600 dark:disabled:hover:border-blue-600"
           >
             {isVerifying ? 'Verifying...' : 'Verify Signature'}

@@ -43,6 +43,17 @@ export function verifySignature(message: string, signature: string, publicKey: s
   }
 }
 
+export function verifySignatureWithAddress(message: string, signature: string, address: string): boolean {
+  try {
+    const messageBytes = ethers.toUtf8Bytes(message);
+    const messageHash = ethers.keccak256(messageBytes);
+    const recoveredAddress = ethers.recoverAddress(messageHash, signature);
+    return recoveredAddress.toLowerCase() === address.toLowerCase();
+  } catch {
+    return false;
+  }
+}
+
 export function createEthereumTransaction(to: string, value: string, nonce: number, gasLimit: string, gasPrice: string): string {
   const transaction = {
     to,

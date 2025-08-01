@@ -1,11 +1,20 @@
 import { useState } from 'react';
 import { signMessage, createEthereumTransaction } from '../../utils/crypto';
+import { Copy } from 'lucide-react';
 
-interface MessageSignerProps {
-  privateKey: string;
+interface PrivateKey {
+  id: string;
+  index: number;
+  key: string;
+  derivationPath: string;
 }
 
-export default function MessageSigner({ privateKey }: MessageSignerProps) {
+interface MessageSignerProps {
+  privateKeys: PrivateKey[];
+}
+
+export default function MessageSigner({ privateKeys }: MessageSignerProps) {
+  const [selectedPrivateKeyId, setSelectedPrivateKeyId] = useState('');
   const [message, setMessage] = useState('');
   const [signature, setSignature] = useState('');
   const [messageType, setMessageType] = useState<'custom' | 'ethereum'>('custom');
@@ -18,6 +27,7 @@ export default function MessageSigner({ privateKey }: MessageSignerProps) {
   });
 
   const resetAll = () => {
+    setSelectedPrivateKeyId('');
     setMessage('');
     setSignature('');
     setMessageType('custom');
@@ -31,10 +41,13 @@ export default function MessageSigner({ privateKey }: MessageSignerProps) {
   };
 
   const handleSignMessage = () => {
-    if (!privateKey || !message) return;
+    if (!selectedPrivateKeyId || !message) return;
+    
+    const selectedPrivateKey = privateKeys.find(pk => pk.id === selectedPrivateKeyId);
+    if (!selectedPrivateKey) return;
     
     try {
-      const sig = signMessage(message, privateKey);
+      const sig = signMessage(message, selectedPrivateKey.key);
       setSignature(sig);
     } catch (error) {
       console.error('Signing failed:', error);
@@ -59,66 +72,99 @@ export default function MessageSigner({ privateKey }: MessageSignerProps) {
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 border border-gray-200 dark:border-gray-700">
-      <div className="flex items-center gap-4 mb-8">
-        <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center flex-shrink-0">
-          <span className="text-white font-bold text-lg">4</span>
-        </div>
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Sign Message</h2>
-      </div>
+      <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4">
+        5. Sign Messages
+      </h2>
 
-      {!privateKey ? (
-        <div className="text-center py-8 text-gray-600 dark:text-gray-300">
-          <p>Generate a private key first to sign messages</p>
+      {privateKeys.length === 0 ? (
+        <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-6 border border-gray-200 dark:border-gray-600">
+          <p className="text-gray-600 dark:text-gray-400 text-center">
+            Generate private keys first to sign messages
+          </p>
         </div>
       ) : (
         <div className="space-y-6">
           <div className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-            <p>Sign messages using your private key:</p>
+            <p>Sign messages using your private keys:</p>
             <ul className="list-disc list-inside mt-2 space-y-1">
+              <li>Select which account (private key) to use for signing</li>
               <li>Custom messages can be any text you want to sign</li>
               <li>Ethereum transactions follow a specific format</li>
-              <li>Signatures prove ownership of the private key</li>
+              <li>Signatures prove ownership of the selected private key</li>
             </ul>
           </div>
 
-          <div className="flex gap-2 mb-6">
+          <div className="space-y-3 mb-6">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Select Account to Sign With:
+            </label>
+            <select
+              value={selectedPrivateKeyId}
+              onChange={(e) => setSelectedPrivateKeyId(e.target.value)}
+              className="w-full p-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent text-gray-700 dark:text-white"
+            >
+              <option value="">Select an account...</option>
+              {privateKeys.map((privateKey) => (
+                <option key={privateKey.id} value={privateKey.id}>
+                  Account {privateKey.index}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className={`flex gap-2 mb-6 ${!selectedPrivateKeyId ? 'opacity-50 pointer-events-none' : ''}`}>
             <button
               onClick={() => setMessageType('custom')}
+              disabled={!selectedPrivateKeyId}
               className={`flex-1 px-4 py-2 rounded-md font-medium transition-colors duration-200 border ${
                 messageType === 'custom'
                   ? 'bg-blue-500 text-white border-blue-500 dark:bg-blue-600 dark:border-blue-600'
                   : 'bg-gray-50 text-gray-600 hover:bg-gray-100 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 dark:border-gray-600'
-              }`}
+              } disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               Custom Message
             </button>
             <button
               onClick={() => setMessageType('ethereum')}
+              disabled={!selectedPrivateKeyId}
               className={`flex-1 px-4 py-2 rounded-md font-medium transition-colors duration-200 border ${
                 messageType === 'ethereum'
                   ? 'bg-blue-500 text-white border-blue-500 dark:bg-blue-600 dark:border-blue-600'
                   : 'bg-gray-50 text-gray-600 hover:bg-gray-100 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 dark:border-gray-600'
-              }`}
+              } disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               Ethereum Transaction
             </button>
           </div>
 
           {messageType === 'custom' ? (
-            <div className="space-y-4">
+            <div className={`space-y-4 ${!selectedPrivateKeyId ? 'opacity-50' : ''}`}>
               <label className="block text-sm font-medium text-blue-600 dark:text-blue-400">
                 Message to Sign:
               </label>
-              <textarea
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                className="w-full p-4 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent text-gray-700 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
-                rows={4}
-                placeholder="Enter your message here..."
-              />
+              <div className="relative">
+                <textarea
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  disabled={!selectedPrivateKeyId}
+                  className="w-full p-4 pr-12 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent text-gray-700 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                  rows={4}
+                  placeholder={selectedPrivateKeyId ? "Enter your message here..." : "Select an account first..."}
+                />
+                {message && (
+                  <button
+                    onClick={() => copyToClipboard(message)}
+                    disabled={!selectedPrivateKeyId}
+                    className="absolute top-3 right-3 p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Copy to clipboard"
+                  >
+                    <Copy size={16} />
+                  </button>
+                )}
+              </div>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className={`space-y-4 ${!selectedPrivateKeyId ? 'opacity-50' : ''}`}>
               <label className="block text-sm font-medium text-blue-600 dark:text-blue-400">
                 Ethereum Transaction Details:
               </label>
@@ -129,7 +175,8 @@ export default function MessageSigner({ privateKey }: MessageSignerProps) {
                     type="text"
                     value={ethereumTx.to}
                     onChange={(e) => setEthereumTx({...ethereumTx, to: e.target.value})}
-                    className="w-full p-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent text-sm text-gray-700 dark:text-white"
+                    disabled={!selectedPrivateKeyId}
+                    className="w-full p-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent text-sm text-gray-700 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
                   />
                 </div>
                 <div>
@@ -138,7 +185,8 @@ export default function MessageSigner({ privateKey }: MessageSignerProps) {
                     type="text"
                     value={ethereumTx.value}
                     onChange={(e) => setEthereumTx({...ethereumTx, value: e.target.value})}
-                    className="w-full p-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent text-sm text-gray-700 dark:text-white"
+                    disabled={!selectedPrivateKeyId}
+                    className="w-full p-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent text-sm text-gray-700 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
                   />
                 </div>
                 <div>
@@ -147,7 +195,8 @@ export default function MessageSigner({ privateKey }: MessageSignerProps) {
                     type="number"
                     value={ethereumTx.nonce}
                     onChange={(e) => setEthereumTx({...ethereumTx, nonce: parseInt(e.target.value)})}
-                    className="w-full p-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent text-sm text-gray-700 dark:text-white"
+                    disabled={!selectedPrivateKeyId}
+                    className="w-full p-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent text-sm text-gray-700 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
                   />
                 </div>
                 <div>
@@ -156,7 +205,8 @@ export default function MessageSigner({ privateKey }: MessageSignerProps) {
                     type="text"
                     value={ethereumTx.gasLimit}
                     onChange={(e) => setEthereumTx({...ethereumTx, gasLimit: e.target.value})}
-                    className="w-full p-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent text-sm text-gray-700 dark:text-white"
+                    disabled={!selectedPrivateKeyId}
+                    className="w-full p-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent text-sm text-gray-700 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
                   />
                 </div>
                 <div className="col-span-2">
@@ -165,7 +215,8 @@ export default function MessageSigner({ privateKey }: MessageSignerProps) {
                     type="text"
                     value={ethereumTx.gasPrice}
                     onChange={(e) => setEthereumTx({...ethereumTx, gasPrice: e.target.value})}
-                    className="w-full p-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent text-sm text-gray-700 dark:text-white"
+                    disabled={!selectedPrivateKeyId}
+                    className="w-full p-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent text-sm text-gray-700 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
                   />
                 </div>
               </div>
@@ -173,7 +224,8 @@ export default function MessageSigner({ privateKey }: MessageSignerProps) {
             ">
                 <button
                   onClick={handleCreateEthereumTx}
-                  className="bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-md transition-colors duration-200 border border-blue-500 hover:border-blue-600 dark:border-blue-600 dark:hover:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+                  disabled={!selectedPrivateKeyId}
+                  className="bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-md transition-colors duration-200 border border-blue-500 hover:border-blue-600 dark:border-blue-600 dark:hover:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-500 disabled:hover:border-blue-500 dark:disabled:hover:bg-blue-600 dark:disabled:hover:border-blue-600"
                 >
                   Generate Transaction Message
                 </button>
@@ -181,18 +233,16 @@ export default function MessageSigner({ privateKey }: MessageSignerProps) {
               {message && (
                 <div>
                   <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Generated Message:</label>
-                  <div className="flex items-start gap-3">
-                    <pre className="flex-1 bg-gray-50 dark:bg-gray-700 p-4 rounded-lg text-xs overflow-x-auto border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300">
+                  <div className="relative">
+                    <pre className="bg-gray-50 dark:bg-gray-700 p-4 pr-12 rounded-lg text-xs overflow-x-auto border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300">
                       {message}
                     </pre>
                     <button
                       onClick={() => copyToClipboard(message)}
-                      className="bg-blue-500 hover:bg-blue-600 dark:bg-gray-600 dark:hover:bg-gray-700 text-white px-4 py-4 rounded-md transition-colors duration-200 border border-blue-500 hover:border-blue-600 dark:border-gray-600 dark:hover:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-gray-400 focus:ring-offset-2 dark:focus:ring-offset-gray-800 flex-shrink-0"
-                      title="Copy message to clipboard"
+                      className="absolute top-3 right-3 p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                      title="Copy to clipboard"
                     >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                      </svg>
+                      <Copy size={16} />
                     </button>
                   </div>
                 </div>
@@ -203,7 +253,7 @@ export default function MessageSigner({ privateKey }: MessageSignerProps) {
           <div className="flex gap-2">
             <button
               onClick={handleSignMessage}
-              disabled={!message}
+              disabled={!message || !selectedPrivateKeyId}
               className="flex-1 bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-md transition-colors duration-200 border border-blue-500 hover:border-blue-600 dark:border-blue-600 dark:hover:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-500 disabled:hover:border-blue-500 dark:disabled:hover:bg-blue-600 dark:disabled:hover:border-blue-600"
             >
               Sign Message
@@ -221,23 +271,24 @@ export default function MessageSigner({ privateKey }: MessageSignerProps) {
               <label className="block text-sm font-medium text-blue-600 dark:text-blue-400">
                 Signature:
               </label>
-              <div className="flex items-center gap-3">
-                <div className="flex-1 bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600 font-mono text-sm break-all text-gray-700 dark:text-gray-300">
+              <div className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-3">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs text-gray-500 dark:text-gray-400">Digital Signature</span>
+                  <button
+                    onClick={() => copyToClipboard(signature)}
+                    className="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                    title="Copy to clipboard"
+                  >
+                    <Copy size={16} />
+                  </button>
+                </div>
+                <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded p-2 font-mono text-sm break-all text-gray-700 dark:text-gray-300">
                   {signature}
                 </div>
-                <button
-                  onClick={() => copyToClipboard(signature)}
-                  className="bg-blue-500 hover:bg-blue-600 dark:bg-gray-600 dark:hover:bg-gray-700 text-white px-4 py-4 rounded-md transition-colors duration-200 border border-blue-500 hover:border-blue-600 dark:border-gray-600 dark:hover:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-gray-400 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
-                  title="Copy to clipboard"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                  </svg>
-                </button>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  Length: {signature.length} characters
+                </p>
               </div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Length: {signature.length} characters
-              </p>
             </div>
           )}
         </div>
