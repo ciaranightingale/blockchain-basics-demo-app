@@ -101,6 +101,14 @@ function DecentralizedTab({
 
   const handleAddValidator = () => {
     if (newValidatorName) {
+      if (newValidatorStake < 32) {
+        showError(
+          'Insufficient stake! Validators must have at least 32 ETH to participate in consensus.',
+          'Minimum Stake Required'
+        );
+        return;
+      }
+      
       const newValidator = {
         id: Math.random().toString(16).substring(2, 8),
         address: `0x${Math.random().toString(16).substring(2, 8)}...`,
@@ -158,15 +166,27 @@ function DecentralizedTab({
 
   // Toggle validator active status
   const toggleValidatorStatus = (validatorName: string) => {
-    const updatedValidators = validators.map(validator => 
-      validator.name === validatorName
-        ? { ...validator, isActive: !validator.isActive }
-        : validator
+    const validator = validators.find(v => v.name === validatorName);
+    if (!validator) return;
+    
+    if (!validator.isActive && validator.stake < 32) {
+      setTimeout(() => {
+        showError(
+          `Cannot activate validator "${validatorName}" - insufficient stake!\n\nMinimum required: 32 ETH\nCurrent stake: ${validator.stake} ETH\n\nPlease add more stake to reactivate this validator.`,
+          'Insufficient Stake'
+        );
+      }, 100);
+      return;
+    }
+    
+    const updatedValidators = validators.map(v => 
+      v.name === validatorName
+        ? { ...v, isActive: !v.isActive }
+        : v
     );
     setValidators(updatedValidators);
     
-    const validator = validators.find(v => v.name === validatorName);
-    const newStatus = !validator?.isActive;
+    const newStatus = !validator.isActive;
     
     setTimeout(() => {
       showInfo(
@@ -175,6 +195,110 @@ function DecentralizedTab({
       );
     }, 100);
   };
+
+  const handleMaliciousVote = (validatorName: string, voteType: 'approve' | 'reject') => {
+    handleVoteBlock(validatorName, voteType);
+  };
+
+  // Track when blocks are finalized to handle slashing
+  const [processedBlocks, setProcessedBlocks] = useState<Set<number>>(new Set());
+  const [lastVotes, setLastVotes] = useState<Record<string, any>>({});
+  
+  // Capture votes before they get cleared
+  useEffect(() => {
+    if (Object.keys(validatorVotes).length > 0) {
+      setLastVotes({ ...validatorVotes });
+    }
+  }, [validatorVotes]);
+  
+  useEffect(() => {
+    if (blockchain.length === 0) return;
+    
+    const latestBlock = blockchain[blockchain.length - 1];
+    
+    // Only process if this is a new block we haven't seen before
+    if (latestBlock.finalized && !processedBlocks.has(latestBlock.block)) {
+      setProcessedBlocks(prev => new Set([...prev, latestBlock.block]));
+      
+      // Check if any malicious validators participated in this block's consensus
+      const handleSlashing = () => {
+        const allVotes = Object.values(lastVotes || {});
+        
+        const maliciousVotes = allVotes.filter(vote => {
+          const voter = validators.find(v => v.name === vote?.validatorName);
+          return voter?.isMalicious && vote !== null;
+        });
+        
+        // Only slash if malicious validators actually voted
+        if (maliciousVotes.length === 0) return;
+        
+        // Check for coordinated attack (multiple malicious validators voting the same way)
+        const maliciousApproveVotes = maliciousVotes.filter(v => v.voteType === 'approve');
+        const maliciousRejectVotes = maliciousVotes.filter(v => v.voteType === 'reject');
+        const isCoordinatedAttack = maliciousApproveVotes.length > 1 || maliciousRejectVotes.length > 1;
+        
+        if (isCoordinatedAttack) {
+          // Slash all malicious validators who voted the same way 100%
+          const coordAttackValidators = isCoordinatedAttack ? 
+            (maliciousApproveVotes.length > 1 ? maliciousApproveVotes : maliciousRejectVotes) : [];
+            
+          const updatedValidators = validators.map(v => {
+            const isInCoordAttack = coordAttackValidators.some(vote => vote.validatorName === v.name);
+            if (isInCoordAttack) {
+              return { ...v, stake: 0, isActive: false };
+            }
+            return v;
+          });
+          setValidators(updatedValidators);
+          
+          const maliciousNames = coordAttackValidators.map(v => v.validatorName).join(', ');
+          setTimeout(() => {
+            showError(
+              `Coordinated attack detected! All participating malicious validators slashed 100% of their stake and deactivated.\n\nMalicious validators: ${maliciousNames}\n\nTotal validators slashed: ${coordAttackValidators.length}`,
+              'Coordinated Attack Slashing'
+            );
+          }, 500);
+        } else {
+          // Slash individual malicious validators 50%
+          const updatedValidators = validators.map(v => {
+            const maliciousVote = maliciousVotes.find(vote => vote.validatorName === v.name);
+            if (maliciousVote) {
+              const newStake = Math.max(0, v.stake * 0.5);
+              const willBeDeactivated = newStake < 32;
+              return { ...v, stake: newStake, isActive: !willBeDeactivated && v.isActive };
+            }
+            return v;
+          });
+          setValidators(updatedValidators);
+          
+          maliciousVotes.forEach((vote, index) => {
+            const validator = validators.find(v => v.name === vote.validatorName);
+            if (validator) {
+              const newStake = Math.max(0, validator.stake * 0.5);
+              const willBeDeactivated = newStake < 32;
+              setTimeout(() => {
+                showWarning(
+                  `Malicious validator "${vote.validatorName}" slashed 50% of stake for malicious voting!\n\nStake reduced from ${validator.stake} ETH to ${newStake} ETH${willBeDeactivated ? ' and deactivated due to insufficient stake' : ''}`,
+                  'Malicious Behavior Slashing'
+                );
+              }, 500 + (index * 1000));
+            }
+          });
+        }
+      };
+      
+      // Only trigger slashing if there were malicious votes in the consensus
+      const allVotes = Object.values(lastVotes || {});
+      const hasMaliciousVotes = allVotes.some(vote => {
+        const voter = validators.find(v => v.name === vote?.validatorName);
+        return voter?.isMalicious && vote !== null;
+      });
+      
+      if (hasMaliciousVotes) {
+        setTimeout(handleSlashing, 1000);
+      }
+    }
+  }, [blockchain, validators, lastVotes, setValidators, showError, showWarning, processedBlocks]);
 
   const handleWithdraw = (validatorName: string, amount: number) => {
     const validator = validators.find(v => v.name === validatorName);
@@ -595,17 +719,24 @@ function DecentralizedTab({
                     </span>
                   </div>
                   
-                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">Stake: {validator.stake} ETH</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
+                    Stake: {validator.stake} ETH
+                    {validator.stake < 32 && (
+                      <span className="ml-2 text-xs text-red-600 dark:text-red-400 font-medium">
+                        (Below minimum)
+                      </span>
+                    )}
+                  </p>
                   <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">Address: {validator.address}</p>
                   <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
                     Attestation Power: {validator.isActive ? ((validator.stake / validators.filter(v => v.isActive).reduce((sum, v) => sum + v.stake, 0)) * 100).toFixed(1) : '0'}%
                   </p>
                   
-                  {validator.isMalicious && (
+                  {/* {validator.isMalicious && (
                     <p className="text-sm text-red-600 dark:text-red-400 mb-2 font-medium">
                       Malicious Validator
                     </p>
-                  )}
+                  )} */}
                   
                   <div className="space-y-2">
                     <button
@@ -613,11 +744,13 @@ function DecentralizedTab({
                       className={`w-full px-3 py-2 rounded text-sm font-medium transition-colors ${
                         validator.isActive 
                           ? 'bg-yellow-500 hover:bg-yellow-600 text-white' 
+                          : validator.stake < 32
+                          ? 'bg-gray-400 text-gray-700 cursor-not-allowed'
                           : 'bg-green-500 hover:bg-green-600 text-white'
                       }`}
-                      title={validator.isActive ? 'Temporarily stop validating (can reactivate later)' : 'Start validating and earning rewards'}
+                      title={validator.isActive ? 'Temporarily stop validating (can reactivate later)' : validator.stake < 32 ? 'Insufficient stake - need 32 ETH minimum' : 'Start validating and earning rewards'}
                     >
-                      {validator.isActive ? 'Deactivate' : 'Activate'}
+                      {validator.isActive ? 'Deactivate' : validator.stake < 32 ? 'Insufficient Stake' : 'Activate'}
                     </button>
                     <button
                       onClick={() => {
@@ -677,13 +810,13 @@ function DecentralizedTab({
                       {!validatorVotes[validator.name] ? (
                         <div className="grid grid-cols-2 gap-2">
                           <button
-                            onClick={() => handleVoteBlock(validator.name, 'approve')}
+                            onClick={() => handleMaliciousVote(validator.name, 'approve')}
                             className="py-2 px-3 text-xs font-medium rounded transition-colors bg-green-500 hover:bg-green-600 text-white"
                           >
                             YES ({validator.stake} ETH)
                           </button>
                           <button
-                            onClick={() => handleVoteBlock(validator.name, 'reject')}
+                            onClick={() => handleMaliciousVote(validator.name, 'reject')}
                             className="py-2 px-3 text-xs font-medium rounded transition-colors bg-red-500 hover:bg-red-600 text-white"
                           >
                             NO ({validator.stake} ETH)
@@ -765,9 +898,9 @@ function DecentralizedTab({
                       className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     >
                       <option value="">Choose a validator</option>
-                      {validators.filter(v => v.isActive && v.stake < 2048).map((validator, index) => (
+                      {validators.filter(v => v.stake < 2048).map((validator, index) => (
                         <option key={index} value={validator.name}>
-                          {validator.name} - {validator.stake} ETH (can add up to {2048 - validator.stake} ETH)
+                          {validator.name} - {validator.stake} ETH {!validator.isActive ? '(INACTIVE) ' : ''}(can add up to {2048 - validator.stake} ETH)
                         </option>
                       ))}
                     </select>
