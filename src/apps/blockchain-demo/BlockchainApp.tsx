@@ -269,7 +269,7 @@ const EthereumPoSDemo = () => {
       data: newData
     };
     
-    // Recalculate hash for the changed block and propagate changes
+    // Recalculate hash for the changed block and propagate changes through entire chain
     for (let i = index; i < updatedBlockchain.length; i++) {
       const block = updatedBlockchain[i];
       
@@ -282,7 +282,7 @@ const EthereumPoSDemo = () => {
           block.validator
         );
         updatedBlockchain[i].hash = newHash;
-        // Don't update signedHash - this makes it "unsigned"
+        // Don't update signedHash - this creates the mismatch
       } else {
         // For subsequent blocks, update their prevHash and recalculate their hash
         const newPrevHash = updatedBlockchain[i - 1].hash;
@@ -295,20 +295,20 @@ const EthereumPoSDemo = () => {
           block.validator
         );
         updatedBlockchain[i].hash = newHash;
-        // Don't update signedHash - this makes them all "unsigned"
+        // Don't update signedHash - this creates the mismatch for all subsequent blocks
       }
-      
     }
     
-    // Revalidate all blocks individually based on their own signing status
+    // Revalidate all blocks based on signing status (chain structure is now correct)
     for (let i = 0; i < updatedBlockchain.length; i++) {
       const block = updatedBlockchain[i];
+      
       if (!block.signedHash) {
         block.isValid = 'unsigned'; // Yellow - no signature
       } else if (block.signedHash === block.hash) {
-        block.isValid = true; // Green - valid signature
+        block.isValid = true; // Green - valid signature matches current hash
       } else {
-        block.isValid = false; // Red - invalid signature
+        block.isValid = false; // Red - signature doesn't match current hash
       }
     }
     

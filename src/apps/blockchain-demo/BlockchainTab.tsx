@@ -14,6 +14,7 @@ interface Block {
   data: string;
   hash: string;
   prevHash: string;
+  signedHash: string;
   validator: string;
   isValid: boolean | 'unsigned';
   isMalicious?: boolean;
@@ -114,7 +115,7 @@ const BlockchainTab: React.FC<BlockchainTabProps> = ({
                   <div key={index} className="flex items-center">
                     {/* Block */}
                     <div 
-                      className={`w-80 h-[28rem] flex-shrink-0 border-2 rounded-lg p-4 transition-colors relative ${
+                      className={`w-80 h-[32rem] flex-shrink-0 border-2 rounded-lg p-4 transition-colors relative ${
                         block.isMalicious
                           ? 'border-red-600 bg-red-100 dark:bg-red-900/20 dark:border-red-500 shadow-red-200 shadow-lg'
                           : block.isValid === false
@@ -182,7 +183,7 @@ const BlockchainTab: React.FC<BlockchainTabProps> = ({
                         <div className="space-y-2 mt-auto">
                           <div>
                             <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">Previous Hash:</label>
-                            <div className={`text-xs font-mono break-all p-1 rounded overflow-auto max-h-20 ${
+                            <div className={`text-xs font-mono break-all p-1 rounded overflow-auto max-h-16 ${
                               block.isValid === false && index > 0
                                 ? 'text-red-800 bg-red-100 border border-red-300 dark:text-red-300 dark:bg-red-900/20 dark:border-red-500'
                                 : block.isValid === 'unsigned' && index > 0
@@ -194,7 +195,7 @@ const BlockchainTab: React.FC<BlockchainTabProps> = ({
                           </div>
                           <div>
                             <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">Block Hash:</label>
-                            <div className={`text-xs font-mono break-all p-1 rounded overflow-auto max-h-20 ${
+                            <div className={`text-xs font-mono break-all p-1 rounded overflow-auto max-h-16 ${
                               block.isValid === false
                                 ? 'text-red-800 bg-red-100 border border-red-300 dark:text-red-300 dark:bg-red-900/20 dark:border-red-500' 
                                 : block.isValid === 'unsigned'
@@ -202,6 +203,18 @@ const BlockchainTab: React.FC<BlockchainTabProps> = ({
                                 : 'text-gray-800 bg-blue-100 dark:text-blue-200 dark:bg-blue-900/20'
                             }`}>
                               {block.hash}
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">Signed Hash:</label>
+                            <div className={`text-xs font-mono break-all p-1 rounded overflow-auto max-h-16 ${
+                              !block.signedHash
+                                ? 'text-gray-500 bg-gray-100 border border-gray-300 dark:text-gray-400 dark:bg-gray-700 dark:border-gray-600'
+                                : block.signedHash === block.hash
+                                ? 'text-green-800 bg-green-100 border border-green-300 dark:text-green-300 dark:bg-green-900/20 dark:border-green-500'
+                                : 'text-red-800 bg-red-100 border border-red-300 dark:text-red-300 dark:bg-red-900/20 dark:border-red-500'
+                            }`}>
+                              {block.signedHash || 'Not signed'}
                             </div>
                           </div>
                           

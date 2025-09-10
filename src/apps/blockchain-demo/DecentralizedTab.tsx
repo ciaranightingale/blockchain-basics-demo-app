@@ -427,11 +427,6 @@ function DecentralizedTab({
                             }`}>
                               {block.isValid === false ? 'Invalid' : block.isValid === true ? 'Valid' : 'Unsigned'}
                             </span>
-                            {block.finalized && (
-                              <span className="text-xs bg-blue-200 text-blue-800 dark:bg-blue-800 dark:text-blue-200 px-2 py-1 rounded-full">
-                                {block.attestations}% consensus
-                              </span>
-                            )}
                           </div>
                         </div>
 
