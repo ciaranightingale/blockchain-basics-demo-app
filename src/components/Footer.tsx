@@ -218,7 +218,7 @@ export default function Footer({ title = 'Updraft Learning Hub', socials = defau
           <div className="flex items-center justify-center gap-2">
             <AlertTriangle className="w-5 h-5 text-red-500 dark:text-red-400 flex-shrink-0" />
             <p>
-              For educational purposes only. This is a learning demonstration and should not be used with real cryptocurrency or in production environments.
+              This is a demo app and doesn't use any real funds, accounts or cryptographic keys.
             </p>
           </div>
         </div>
